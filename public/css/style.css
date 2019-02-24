@@ -1,0 +1,50 @@
+svg .st0 {
+    fill: #FFFFFF;
+    stroke: #E4E4E6;
+    stroke-width: 12;
+    stroke-miterlimit: 10;
+}
+
+svg .st1 {
+    fill: none;
+    stroke: #E4E4E6;
+    stroke-width: 3;
+    stroke-miterlimit: 10;
+}
+
+svg .st2 {
+    fill: #C2C7CA;
+}
+
+svg .st3 {
+    fill: #E4E4E6;
+}
+
+svg .st4 {
+    fill: #F8F9FB;
+}
+
+svg .st5 {
+    fill: none;
+    stroke: #E4E4E6;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-miterlimit: 10;
+}
+
+svg .st6 {
+    fill: #1894FC;
+}
+
+svg .st7 {
+    fill: #47485A;
+}
+
+svg .st8 {
+    fill: #00D2B8;
+}
+
+svg .st9 {
+    fill: #35444F;
+}
