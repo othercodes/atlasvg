@@ -2,8 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Building;
+
 class AtlasVGController extends Controller
 {
+
+    public function demo()
+    {
+        Building::all()->each(function (Building $building) {
+            var_dump($building->toArray());
+        });
+    }
 
     public function index()
     {

@@ -20,10 +20,6 @@ class CreateCategoriesTable extends Migration
 
             $table->timestamps();
         });
-
-        \Illuminate\Support\Facades\DB::table('categories')->insert([
-            'name' => 'Uncategorized',
-        ]);
     }
 
     /**
