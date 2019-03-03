@@ -12,7 +12,7 @@ class AtlasVGController extends Controller
             $maps[$i + 1] = $this->getMap($m);
         }
 
-        return view('index', [
+        return view('main', [
             'maps' => $maps
         ]);
     }
