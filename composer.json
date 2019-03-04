@@ -35,7 +35,7 @@
     }
   },
   "scripts": {
-    "post-root-package-install": [
+    "post-install-cmd": [
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
       "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\""
     ]
