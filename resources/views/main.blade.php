@@ -5,73 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>AtlasVG</title>
-    <style>
-        <?php foreach ($categories as $category): ?>
-        .grouped-by-category [data-category='<?php echo $category->id; ?>']:first-child,
-        .grouped-by-category :not([data-category='<?php echo $category->id; ?>']) + [data-category='<?php echo $category->id; ?>'] {
-            margin-top: 4em;
-        }
-
-        .grouped-by-category [data-category='<?php echo $category->id; ?>']:first-child::before,
-        .grouped-by-category :not([data-category='<?php echo $category->id; ?>']) + [data-category='<?php echo $category->id; ?>']::before {
-            font-size: 1.25em;
-            position: absolute;
-            top: -1.75em;
-            left: 0;
-            color: #c7c7c9;
-        }
-
-        .grouped-by-category [data-category='<?php echo $category->id; ?>']:first-child::before,
-        .grouped-by-category :not([data-category='<?php echo $category->id; ?>']) + [data-category='<?php echo $category->id; ?>']::before {
-            content: '<?php echo $category->name; ?>';
-            color: <?php echo $category->color; ?>;
-        }
-
-        .content__item[data-category='<?php echo $category->id; ?>'] .content__item-title {
-            color: <?php echo $category->color; ?>;
-        }
-
-        .pin[data-category='<?php echo $category->id; ?>'] .icon--pin {
-            fill: <?php echo $category->color; ?>;
-        }
-
-        <?php endforeach; ?>
-
-        <?php $levelHeight = 0; ?>
-        <?php foreach ($building->levels as $index => $level): ?>
-        .level--<?php echo $level->level . '::after'; ?> {
-            content: '<?php echo $level->name; ?>';
-        }
-
-        <?php if ($index > 0): ?>
-        .level--<?php echo $level->level; ?> {
-            -webkit-transform: translateZ(<?php echo $levelHeight=+10; ?>vmin);
-            transform: translateZ(<?php echo $levelHeight=+10; ?>vmin);
-        }
-
-        <?php endif; ?>
-
-        .levels--selected-<?php echo $level->level; ?> .level:not(.level--<?php echo $level->level; ?>) {
-            opacity: 0;
-        }
-
-        <?php for($i=0;$i<=count($building->levels);$i++): ?>
-
-        <?php if ($i > $level->level): ?>
-        .levels--selected-<?php echo $i; ?> .level--<?php echo $level->level; ?> {
-            -webkit-transform: translateZ(-60vmin);
-            transform: translateZ(-60vmin);
-        }
-
-        <?php endif; ?>
-
-        <?php endfor; ?>
-        <?php endforeach; ?>
-
-    </style>
-    <link rel="stylesheet" type="text/css" href="css/normalize.css"/>
-    <link rel="stylesheet" type="text/css" href="css/style.css"/>
-    <script type="text/javascript" src="js/modernizr-custom.js"></script>
+    @include('css')
+    <link rel="stylesheet" type="text/css" href="{{URL::to('/')}}/css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="{{URL::to('/')}}/css/front.style.css"/>
+    <script type="text/javascript" src="{{URL::to('/')}}/js/modernizr-custom.js"></script>
 </head>
 <body>
 
@@ -354,34 +291,33 @@
         <!-- Map -->
         <div class="mall">
             <div class="surroundings">
-                <div class="surroundings__map">
-                    <?php echo $building->surroundings; ?>
-                </div>
+                <div class="surroundings__map">{!! $building->surroundings !!}</div>
             </div>
             <div class="levels">
-                <?php foreach ($building->levels as $level) : ?>
-                    <div class="level level--<?php echo $level->level; ?>" data-level="L<?php echo $level->level; ?>">
-                        <?php echo $level->svg; ?>
+                @foreach ($building->levels as $level)
+                    <div class="level level--{{ $level->level }}" data-level="L{{ $level->level }}">
+                        {!! $level->svg !!}
                         <div class="level__pins">
-                            <?php foreach ($level->spaces as $space) : ?>
-                                <?php foreach ($space->pointers as $index => $pointer) : ?>
-
-                                    <a class="pin pin--<?php echo $level->level; ?>-<?php echo $index + 1; ?>"
+                            @foreach ($level->spaces as $space)
+                                @foreach ($space->pointers as $index => $pointer)
+                                    <a class="pin pin--{{ $level->level }}-{{ $index + 1 }}"
                                        href="#"
-                                       data-category="<?php echo $pointer->category_id; ?>"
-                                       data-space="<?php echo $pointer->space->data; ?>"
-                                       style="top:<?php echo $pointer->top; ?>vmin;left:<?php echo $pointer->left; ?>vmin;"
-                                       aria-label="<?php echo $pointer->name; ?>">
+                                       data-category="{{ $pointer->category_id }}"
+                                       data-space="{{ $pointer->space->data }}"
+                                       style="top:{{ $pointer->top }}vmin;left:{{ $pointer->left }}vmin;"
+                                       aria-label="{{ $pointer->name }}">
                                         <span class="pin__icon">
-                                            <svg class="icon icon--pin"><use xlink:href="#icon-pin"></use></svg>
+                                            <svg class="icon icon--pin">
+                                                <use xlink:href="#icon-pin"></use>
+                                            </svg>
                                         </span>
                                     </a>
 
-                                <?php endforeach; ?>
-                            <?php endforeach; ?>
+                                @endforeach
+                            @endforeach
                         </div>
                     </div>
-                <?php endforeach; ?>
+                @endforeach
             </div>
         </div>
 
@@ -416,23 +352,23 @@
                     <use xlink:href="#icon-cross"></use>
                 </svg>
             </button>
-            <?php foreach ($building->levels as $level) : ?>
-                <?php foreach ($level->spaces as $space) : ?>
-                    <?php foreach ($space->pointers as $index => $pointer) : ?>
+            @foreach ($building->levels as $level)
+                @foreach ($level->spaces as $space)
+                    @foreach ($space->pointers as $index => $pointer)
                         <div class="content__item"
-                             data-space="<?php echo $pointer->space->data; ?>"
-                             data-category="<?php echo $pointer->category_id; ?>">
-                            <h3 class="content__item-title"><?php echo $pointer->name; ?></h3>
+                             data-space="{{ $pointer->space->data }}"
+                             data-category="{{ $pointer->category_id }}">
+                            <h3 class="content__item-title">{{ $pointer->name }}</h3>
                             <div class="content__item-details">
                                 <p class="content__meta">
-                                    <span class="content__meta-item"><?php echo $pointer->meta; ?></span>
+                                    <span class="content__meta-item">{{ $pointer->meta }}</span>
                                 </p>
-                                <p class="content__desc"><?php echo $pointer->description; ?></p>
+                                <p class="content__desc">{{ $pointer->description }}</p>
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                <?php endforeach; ?>
-            <?php endforeach; ?>
+                    @endforeach
+                @endforeach
+            @endforeach
 
         </div>
     </div>
@@ -451,28 +387,28 @@
             <label class="label__text">A - Z</label>
         </span>
         <ul class="list grouped-by-category">
-            <?php foreach ($building->levels as $level) : ?>
-                <?php foreach ($level->spaces as $space) : ?>
-                    <?php foreach ($space->pointers as $index => $pointer) : ?>
+            @foreach ($building->levels as $level)
+                @foreach ($level->spaces as $space)
+                    @foreach ($space->pointers as $index => $pointer)
                         <li class="list__item"
-                            data-level="<?php echo $level->level; ?>"
-                            data-category="<?php echo $pointer->category_id; ?>"
-                            data-space="<?php echo $pointer->space->data; ?>">
+                            data-level="{{ $level->level }}"
+                            data-category="{{ $pointer->category_id }}"
+                            data-space="{{ $pointer->space->data }}">
                             <a href="#" class="list__link">
-                                <?php echo $pointer->name; ?>
+                                {{ $pointer->name }}
                             </a>
                         </li>
-                    <?php endforeach; ?>
-                <?php endforeach; ?>
-            <?php endforeach; ?>
+                    @endforeach
+                @endforeach
+            @endforeach
         </ul>
     </aside>
 
 </section>
 
-<script type="text/javascript" src="js/classie.js"></script>
-<script type="text/javascript" src="js/list.min.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="{{URL::to('/')}}/js/classie.js"></script>
+<script type="text/javascript" src="{{URL::to('/')}}/js/list.min.js"></script>
+<script type="text/javascript" src="{{URL::to('/')}}/js/main.js"></script>
 
 </body>
 </html>
