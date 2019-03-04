@@ -1,11 +1,3 @@
-@font-face {
-    font-family: 'codropsicons';
-    font-weight: normal;
-    font-style: normal;
-    src: url('../fonts/codropsicons/codropsicons.eot');
-    src: url('../fonts/codropsicons/codropsicons.eot?#iefix') format('embedded-opentype'), url('../fonts/codropsicons/codropsicons.woff') format('woff'), url('../fonts/codropsicons/codropsicons.ttf') format('truetype'), url('../fonts/codropsicons/codropsicons.svg#codropsicons') format('svg');
-}
-
 *,
 *::after,
 *::before {
@@ -69,82 +61,6 @@ button:focus {
     position: relative;
     width: 100vw;
     height: 100vh;
-}
-
-/* Header */
-
-.codrops-header {
-    position: absolute;
-    z-index: 100;
-    top: 0;
-    left: 0;
-    display: -webkit-flex;
-    display: flex;
-    -webkit-align-items: center;
-    align-items: center;
-    padding: 1.5em 1em;
-    text-align: center;
-}
-
-.codrops-header h1 {
-    font-size: 1.15em;
-    font-weight: normal;
-    line-height: 1;
-    margin: 0 0 0 1em;
-}
-
-/* Top Navigation Style */
-
-.codrops-links {
-    position: relative;
-    display: inline-block;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.codrops-links::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 1px;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.1);
-    -webkit-transform: rotate3d(0, 0, 1, 22.5deg);
-    transform: rotate3d(0, 0, 1, 22.5deg);
-}
-
-.codrops-icon {
-    display: inline-block;
-    width: 1.5em;
-    margin: 0.5em;
-    padding: 0em 0;
-    text-decoration: none;
-}
-
-.codrops-icon span {
-    display: none;
-}
-
-.codrops-icon::before {
-    font-family: 'codropsicons';
-    font-weight: normal;
-    font-style: normal;
-    font-variant: normal;
-    line-height: 1;
-    margin: 0 5px;
-    text-transform: none;
-    speak: none;
-    -webkit-font-smoothing: antialiased;
-}
-
-.codrops-icon--drop::before {
-    content: '\e001';
-    color: #09c;
-}
-
-.codrops-icon--prev::before {
-    content: '\e004';
 }
 
 .main {
@@ -262,102 +178,19 @@ button:focus {
     transform: rotateZ(-20deg) rotateZ(45deg) rotateX(-70deg) translateZ(5vmin) translateX(5vmin) translateY(-10vmin);
 }
 
-.level--1::after {
-    content: 'L1';
-}
-
-.level--2::after {
-    content: 'L2';
-}
-
-.level--3::after {
-    content: 'L3';
-}
-
-.level--4::after {
-    content: 'L4';
-}
-
 .level:not(:first-child) {
     position: absolute;
     top: 0;
     left: 0;
 }
 
-.level--2 {
-    -webkit-transform: translateZ(10vmin);
-    transform: translateZ(10vmin);
-}
-
-.level--3 {
-    -webkit-transform: translateZ(20vmin);
-    transform: translateZ(20vmin);
-}
-
-.level--4 {
-    -webkit-transform: translateZ(30vmin);
-    transform: translateZ(30vmin);
-}
-
-
-/* Selection transitions */
-
-.levels--selected-1 .level:not(.level--1),
-.levels--selected-2 .level:not(.level--2),
-.levels--selected-3 .level:not(.level--3),
-.levels--selected-4 .level:not(.level--4) {
-    opacity: 0;
-    /* fade out all others */
-}
-
 /* Other levels */
-
 .level--current ~ .level {
     -webkit-transform: translateZ(90vmin);
     transform: translateZ(90vmin);
 }
 
-.levels--selected-2 .level--1,
-.levels--selected-3 .level--1,
-.levels--selected-4 .level--1,
-.levels--selected-3 .level--2,
-.levels--selected-4 .level--2,
-.levels--selected-4 .level--3 {
-    -webkit-transform: translateZ(-60vmin);
-    transform: translateZ(-60vmin);
-}
-
-/* Delays */
-/* 1 */
-
-.levels--selected-1 .level--3,
-.levels--selected-2 .level--3,
-.levels--selected-3 .level--2,
-.levels--selected-4 .level--2 {
-    -webkit-transition-delay: 0.1s;
-    transition-delay: 0.1s;
-}
-
-.levels--selected-1 .level--2,
-.levels--selected-2 .level--current,
-.levels--selected-2 .level--current::after,
-.levels--selected-3 .level--current,
-.levels--selected-3 .level--current::after,
-.levels--selected-4 .level--3 {
-    -webkit-transition-delay: 0.25s;
-    transition-delay: 0.25s;
-}
-
-.levels--selected-1 .level--current,
-.levels--selected-1 .level--current::after,
-.levels--selected-4 .level--current,
-.levels--selected-4 .level--current::after {
-    -webkit-transition-delay: 0.45s;
-    transition-delay: 0.45s;
-}
-
 /* Current level */
-
 .level.level--current {
     -webkit-transform: translateZ(15vmin) rotate3d(0, 0, 1, 20deg);
     /* go to center */
@@ -391,7 +224,6 @@ button:focus {
     -webkit-transform: translateZ(-60vmin);
     transform: translateZ(-60vmin);
 }
-
 
 /* Level nav */
 .mallnav {
@@ -522,22 +354,6 @@ button:focus {
     opacity: 0;
     -webkit-transform: translate3d(0, -3em, 0) translate3d(0, -100%, 0);
     transform: translate3d(0, -3em, 0) translate3d(0, -100%, 0);
-}
-
-.content__item[data-category='1'] .content__item-title {
-    color: #7cbf7f;
-}
-
-.content__item[data-category='2'] .content__item-title {
-    color: #6584c7;
-}
-
-.content__item[data-category='3'] .content__item-title {
-    color: #dc4b7c;
-}
-
-.content__item[data-category='4'] .content__item-title {
-    color: #8d65e0;
 }
 
 .content__item--hover .content__item-title {
@@ -678,56 +494,6 @@ button:focus {
     margin-top: 2em;
 }
 
-.grouped-by-category [data-category='1']:first-child,
-.grouped-by-category :not([data-category='1']) + [data-category='1'],
-.grouped-by-category [data-category='2']:first-child,
-.grouped-by-category :not([data-category='2']) + [data-category='2'],
-.grouped-by-category [data-category='3']:first-child,
-.grouped-by-category :not([data-category='3']) + [data-category='3'],
-.grouped-by-category [data-category='4']:first-child,
-.grouped-by-category :not([data-category='4']) + [data-category='4'] {
-    margin-top: 4em;
-}
-
-.grouped-by-category [data-category='1']:first-child::before,
-.grouped-by-category :not([data-category='1']) + [data-category='1']::before,
-.grouped-by-category [data-category='2']:first-child::before,
-.grouped-by-category :not([data-category='2']) + [data-category='2']::before,
-.grouped-by-category [data-category='3']:first-child::before,
-.grouped-by-category :not([data-category='3']) + [data-category='3']::before,
-.grouped-by-category [data-category='4']:first-child::before,
-.grouped-by-category :not([data-category='4']) + [data-category='4']::before {
-    font-size: 1.25em;
-    position: absolute;
-    top: -1.75em;
-    left: 0;
-    color: #c7c7c9;
-}
-
-.grouped-by-category [data-category='1']:first-child::before,
-.grouped-by-category :not([data-category='1']) + [data-category='1']::before {
-    content: 'Nourish & Refresh';
-    color: #7cbf7f;
-}
-
-.grouped-by-category [data-category='2']:first-child::before,
-.grouped-by-category :not([data-category='2']) + [data-category='2']::before {
-    content: 'Learn & Create';
-    color: #6584c7;
-}
-
-.grouped-by-category [data-category='3']:first-child::before,
-.grouped-by-category :not([data-category='3']) + [data-category='3']::before {
-    content: 'Swap & Give';
-    color: #dc4b7c;
-}
-
-.grouped-by-category [data-category='4']:first-child::before,
-.grouped-by-category :not([data-category='4']) + [data-category='4']::before {
-    content: 'Relax & Recharge';
-    color: #8d65e0;
-}
-
 .list__item::after {
     content: 'L' attr(data-level) ' / ' attr(data-space);
     font-size: 0.65em;
@@ -798,62 +564,6 @@ button:focus {
     opacity: 1;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
-}
-
-.pin:nth-child(2) .pin__icon {
-    -webkit-transition-delay: 0.05s;
-    transition-delay: 0.05s;
-}
-
-.pin:nth-child(3) .pin__icon {
-    -webkit-transition-delay: 0.1s;
-    transition-delay: 0.1s;
-}
-
-.pin:nth-child(4) .pin__icon {
-    -webkit-transition-delay: 0.15s;
-    transition-delay: 0.15s;
-}
-
-.pin:nth-child(5) .pin__icon {
-    -webkit-transition-delay: 0.2s;
-    transition-delay: 0.2s;
-}
-
-.pin:nth-child(6) .pin__icon {
-    -webkit-transition-delay: 0.25s;
-    transition-delay: 0.25s;
-}
-
-.pin:nth-child(7) .pin__icon {
-    -webkit-transition-delay: 0.3s;
-    transition-delay: 0.3s;
-}
-
-.pin:nth-child(8) .pin__icon {
-    -webkit-transition-delay: 0.35s;
-    transition-delay: 0.35s;
-}
-
-.pin:nth-child(9) .pin__icon {
-    -webkit-transition-delay: 0.4s;
-    transition-delay: 0.4s;
-}
-
-.pin[data-category='1'] .icon--pin {
-    fill: #7cbf7f;
-}
-
-.pin[data-category='2'] .icon--pin {
-    fill: #6584c7;
-}
-
-.pin[data-category='3'] .icon--pin {
-    fill: #dc4b7c;
-}
-
-.pin[data-category='4'] .icon--pin {
-    fill: #8d65e0;
 }
 
 .pin--active .icon--pin {

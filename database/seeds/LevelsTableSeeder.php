@@ -38,5 +38,18 @@ class LevelsTableSeeder extends Seeder
             'created_at' => '2019-03-03 20:23:00',
             'updated_at' => '2019-03-03 20:23:00',
         ]);
+
+        $l3 = trim(file_get_contents($resources . '/sample3.svg'));
+        DB::table('levels')->insert([
+            'id' => 3,
+            'name' => 'L3',
+            'level' => 3,
+            'description' => 'Third floor.',
+            'sign' => md5($l3),
+            'svg' => $l3,
+            'building_id' => 1,
+            'created_at' => '2019-03-03 20:23:00',
+            'updated_at' => '2019-03-03 20:23:00',
+        ]);
     }
 }

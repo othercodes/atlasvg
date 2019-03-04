@@ -4,12 +4,74 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>AtlasVG</title>
+    <style>
+        <?php foreach ($categories as $category): ?>
+        .grouped-by-category [data-category='<?php echo $category->id; ?>']:first-child,
+        .grouped-by-category :not([data-category='<?php echo $category->id; ?>']) + [data-category='<?php echo $category->id; ?>'] {
+            margin-top: 4em;
+        }
 
+        .grouped-by-category [data-category='<?php echo $category->id; ?>']:first-child::before,
+        .grouped-by-category :not([data-category='<?php echo $category->id; ?>']) + [data-category='<?php echo $category->id; ?>']::before {
+            font-size: 1.25em;
+            position: absolute;
+            top: -1.75em;
+            left: 0;
+            color: #c7c7c9;
+        }
+
+        .grouped-by-category [data-category='<?php echo $category->id; ?>']:first-child::before,
+        .grouped-by-category :not([data-category='<?php echo $category->id; ?>']) + [data-category='<?php echo $category->id; ?>']::before {
+            content: '<?php echo $category->name; ?>';
+            color: <?php echo $category->color; ?>;
+        }
+
+        .content__item[data-category='<?php echo $category->id; ?>'] .content__item-title {
+            color: <?php echo $category->color; ?>;
+        }
+
+        .pin[data-category='<?php echo $category->id; ?>'] .icon--pin {
+            fill: <?php echo $category->color; ?>;
+        }
+
+        <?php endforeach; ?>
+
+        <?php $levelHeight = 0; ?>
+        <?php foreach ($building->levels as $index => $level): ?>
+        .level--<?php echo $level->level . '::after'; ?> {
+            content: '<?php echo $level->name; ?>';
+        }
+
+        <?php if ($index > 0): ?>
+        .level--<?php echo $level->level; ?> {
+            -webkit-transform: translateZ(<?php echo $levelHeight=+10; ?>vmin);
+            transform: translateZ(<?php echo $levelHeight=+10; ?>vmin);
+        }
+
+        <?php endif; ?>
+
+        .levels--selected-<?php echo $level->level; ?> .level:not(.level--<?php echo $level->level; ?>) {
+            opacity: 0;
+        }
+
+        <?php for($i=0;$i<=count($building->levels);$i++): ?>
+
+        <?php if ($i > $level->level): ?>
+        .levels--selected-<?php echo $i; ?> .level--<?php echo $level->level; ?> {
+            -webkit-transform: translateZ(-60vmin);
+            transform: translateZ(-60vmin);
+        }
+
+        <?php endif; ?>
+
+        <?php endfor; ?>
+        <?php endforeach; ?>
+
+    </style>
     <link rel="stylesheet" type="text/css" href="css/normalize.css"/>
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
     <script type="text/javascript" src="js/modernizr-custom.js"></script>
-
-    <title>AtlasVG</title>
 </head>
 <body>
 
@@ -304,7 +366,7 @@
                             <?php foreach ($level->spaces as $space) : ?>
                                 <?php foreach ($space->pointers as $index => $pointer) : ?>
 
-                                    <a class="pin pin--<?php echo $level->level; ?>-<?php echo $index; ?>"
+                                    <a class="pin pin--<?php echo $level->level; ?>-<?php echo $index + 1; ?>"
                                        href="#"
                                        data-category="<?php echo $pointer->category_id; ?>"
                                        data-space="<?php echo $pointer->space->data; ?>"
