@@ -15,7 +15,14 @@ class CreateSpacesTable extends Migration
     {
         Schema::create('spaces', function (Blueprint $table) {
             $table->increments('id');
-            //todo
+            $table->string('data');
+
+            $table->unsignedInteger('level_id');
+            $table->foreign('level_id')
+                ->references('id')
+                ->on('levels')
+                ->onDelete('cascade');
+
             $table->timestamps();
         });
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs;
+namespace AtlasVG\Jobs;
 
 class ExampleJob extends Job
 {

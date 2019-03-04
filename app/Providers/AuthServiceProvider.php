@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Providers;
+namespace AtlasVG\Providers;
 
-use App\User;
+use AtlasVG\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace AtlasVG\Events;
 
 class ExampleEvent extends Event
 {

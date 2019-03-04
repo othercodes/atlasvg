@@ -17,7 +17,7 @@ class CreateCategoriesTable extends Migration
                 ->unsigned();
 
             $table->string('name');
-
+            $table->string('color', 7);
             $table->timestamps();
         });
     }

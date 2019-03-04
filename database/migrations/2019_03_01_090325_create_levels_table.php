@@ -17,6 +17,7 @@ class CreateLevelsTable extends Migration
                 ->unsigned();
 
             $table->string('name');
+            $table->integer('level');
             $table->text('description');
             $table->string('sign', 32);
             $table->text('svg');

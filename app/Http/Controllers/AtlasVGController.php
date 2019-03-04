@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace AtlasVG\Http\Controllers;
 
-use App\Models\Building;
+use AtlasVG\Models\Building;
+use AtlasVG\Models\Level;
 
 class AtlasVGController extends Controller
 {
@@ -11,18 +12,21 @@ class AtlasVGController extends Controller
     {
         Building::all()->each(function (Building $building) {
             var_dump($building->toArray());
+            var_dump($building->levels->toArray());
+
+            $building->levels->each(function (Level $level) {
+                var_dump($level->building->toArray());
+            });
         });
     }
 
     public function index()
     {
-        $maps = [];
-        foreach (['sample1.svg', 'sample2.svg'] as $i => $m) {
-            $maps[$i + 1] = $this->getMap($m);
-        }
+
+        $building = Building::select()->first();
 
         return view('main', [
-            'maps' => $maps
+            'building' => $building
         ]);
     }
 }

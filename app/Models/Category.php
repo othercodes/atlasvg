@@ -2,24 +2,21 @@
 
 namespace AtlasVG\Models;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Building
+ * Class Level
  * @property string $name
- * @property string $description
- * @property string $surroundings
- * @property Collection|Level[] $levels
+ * @property string $color
  * @package AtlasVG\Models
  */
-class Building extends Model
+class Category extends Model
 {
     /**
      * Table name
      * @var string
      */
-    protected $table = 'buildings';
+    protected $table = 'categories';
 
     /**
      * Mass assignable
@@ -27,15 +24,15 @@ class Building extends Model
      */
     protected $fillable = [
         'name',
-        'description',
+        'color',
     ];
 
     /**
-     * Get the levels for the building
+     * Get the pointers in the given category
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function levels()
+    public function pointers()
     {
-        return $this->hasMany('AtlasVG\Models\Level');
+        return $this->hasMany('AtlasVG\Models\Pointers');
     }
 }

@@ -25,10 +25,10 @@ class CreatePointersTable extends Migration
             $table->string('left')
                 ->comment('css vmin unit');
 
-            $table->unsignedInteger('level_id');
-            $table->foreign('level_id')
+            $table->unsignedInteger('space_id');
+            $table->foreign('space_id')
                 ->references('id')
-                ->on('levels')
+                ->on('spaces')
                 ->onDelete('cascade');
 
             $table->unsignedInteger('category_id');

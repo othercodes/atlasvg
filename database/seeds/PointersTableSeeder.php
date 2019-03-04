@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class PointersTableSeeder extends Seeder
 {
@@ -10,7 +11,7 @@ class PointersTableSeeder extends Seeder
      */
     public function run()
     {
-        \Illuminate\Support\Facades\DB::table('pointers')->insert([
+        DB::table('pointers')->insert([
             'id' => 1,
             'name' => 'Pin for Apple Heart',
             'meta' => 'Opening Hours: 6:30AM — 11:30PM Phone: (0) 66 5738902',
@@ -19,7 +20,7 @@ class PointersTableSeeder extends Seeder
                 . 'turnip, arracacha water spinach nopal.',
             'top' => 60,
             'left' => 8,
-            'level_id' => 1,
+            'space_id' => 1,
             'category_id' => 1,
             'created_at' => '2019-03-03 20:23:00',
             'updated_at' => '2019-03-03 20:23:00',

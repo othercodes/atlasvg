@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class LevelsTableSeeder extends Seeder
 {
@@ -13,9 +14,10 @@ class LevelsTableSeeder extends Seeder
         $resources = __DIR__ . '/../../resources/maps';
 
         $l1 = trim(file_get_contents($resources . '/sample1.svg'));
-        \Illuminate\Support\Facades\DB::table('levels')->insert([
+        DB::table('levels')->insert([
             'id' => 1,
             'name' => 'L1',
+            'level' => 1,
             'description' => 'First floor.',
             'sign' => md5($l1),
             'svg' => $l1,
@@ -25,9 +27,10 @@ class LevelsTableSeeder extends Seeder
         ]);
 
         $l2 = trim(file_get_contents($resources . '/sample2.svg'));
-        \Illuminate\Support\Facades\DB::table('levels')->insert([
+        DB::table('levels')->insert([
             'id' => 2,
             'name' => 'L2',
+            'level' => 2,
             'description' => 'Second floor.',
             'sign' => md5($l2),
             'svg' => $l2,

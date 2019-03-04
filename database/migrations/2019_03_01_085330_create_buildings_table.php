@@ -17,7 +17,8 @@ class CreateBuildingsTable extends Migration
                 ->unsigned();
 
             $table->string('name');
-            $table->mediumText('description');
+            $table->text('description');
+            $table->text('surroundings');
             $table->timestamps();
         });
     }

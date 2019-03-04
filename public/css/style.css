@@ -195,7 +195,7 @@ button:focus {
     transform-style: preserve-3d;
 }
 
-.surroundings__map {
+.surroundings__map svg {
     opacity: 0.3;
     max-width: 100%;
     display: block;

@@ -288,44 +288,37 @@
 <section class="container">
 
     <div class="main">
+
+        <!-- Map -->
         <div class="mall">
             <div class="surroundings">
-                <img class="surroundings__map" src="img/surroundings.svg" alt="Surroundings">
+                <div class="surroundings__map">
+                    <?php echo $building->surroundings; ?>
+                </div>
             </div>
             <div class="levels">
-                <?php foreach ($maps as $level => $map) : ?>
-                    <div class="level level--<?php echo $level; ?>" data-level="L<?php echo $level; ?>">
-                        <?php echo $map; ?>
+                <?php foreach ($building->levels as $level) : ?>
+                    <div class="level level--<?php echo $level->level; ?>" data-level="L<?php echo $level->level; ?>">
+                        <?php echo $level->svg; ?>
                         <div class="level__pins">
-                            <a class="pin pin--<?php echo $level; ?>-1" data-category="1" data-space="1.01" href="#"
-                               aria-label="Pin for Apple Heart">
-									<span class="pin__icon">
-										<svg class="icon icon--pin"><use xlink:href="#icon-pin"></use></svg>
-										<svg class="icon icon--logo icon--appleheart">
-                                            <use xlink:href="#icon-appleheart"></use>
-                                        </svg>
-									</span>
-                            </a>
-                            <a class="pin pin--<?php echo $level; ?>-2" data-category="1" data-space="1.02" href="#"
-                               aria-label="Pin for Crazy Banana">
-									<span class="pin__icon">
-										<svg class="icon icon--pin"><use xlink:href="#icon-pin"></use></svg>
-										<svg class="icon icon--logo icon--bananas"><use
-                                                    xlink:href="#icon-bananas"></use></svg>
-									</span>
-                            </a>
-                            <a class="pin pin--<?php echo $level; ?>-3" data-category="2" data-space="1.03" href="#"
-                               aria-label="Pin for Folding Life">
-									<span class="pin__icon">
-										<svg class="icon icon--pin"><use xlink:href="#icon-pin"></use></svg>
-										<svg class="icon icon--logo icon--origami"><use
-                                                    xlink:href="#icon-origami"></use></svg>
-									</span>
-                            </a>
+                            <?php foreach ($level->spaces as $space) : ?>
+                                <?php foreach ($space->pointers as $index => $pointer) : ?>
 
+                                    <a class="pin pin--<?php echo $level->level; ?>-<?php echo $index; ?>"
+                                       href="#"
+                                       data-category="<?php echo $pointer->category_id; ?>"
+                                       data-space="<?php echo $pointer->space->data; ?>"
+                                       style="top:<?php echo $pointer->top; ?>vmin;left:<?php echo $pointer->left; ?>vmin;"
+                                       aria-label="<?php echo $pointer->name; ?>">
+                                        <span class="pin__icon">
+                                            <svg class="icon icon--pin"><use xlink:href="#icon-pin"></use></svg>
+                                        </span>
+                                    </a>
+
+                                <?php endforeach; ?>
+                            <?php endforeach; ?>
                         </div>
                     </div>
-
                 <?php endforeach; ?>
             </div>
         </div>
@@ -354,48 +347,31 @@
             </button>
         </nav>
 
-        <!-- Navigation -->
+        <!-- Information Panel -->
         <div class="content">
             <button class="boxbutton boxbutton--dark content__button content__button--hidden" title="Close details">
                 <svg class="icon icon--cross">
                     <use xlink:href="#icon-cross"></use>
                 </svg>
             </button>
-            <div class="content__item" data-space="1.01" data-category="1">
-                <h3 class="content__item-title">Apple Heart</h3>
-                <div class="content__item-details">
-                    <p class="content__meta">
-                        <span class="content__meta-item"><strong>Opening Hours:</strong> 6:30AM &mdash; 11:30PM</span>
-                        <span class="content__meta-item"><strong>Phone:</strong> (0) 66 5738902</span>
-                    </p>
-                    <p class="content__desc">Burdock celery - salsify, tomatillo. Bitter gourd horseradish leaves
-                        radicchio, celeriac miner's lettuce kurrat arugula fluted pumpkin turnip, arracacha water
-                        spinach nopal.</p>
-                </div>
-            </div>
-            <div class="content__item" data-space="1.02" data-category="1">
-                <h3 class="content__item-title">Crazy Banana</h3>
-                <div class="content__item-details">
-                    <p class="content__meta">
-                        <span class="content__meta-item"><strong>Opening Hours:</strong> 7:30AM &mdash; 10:30PM</span>
-                        <span class="content__meta-item"><strong>Phone:</strong> (0) 66 7822786</span>
-                    </p>
-                    <p class="content__desc">Malva verticillata cichorium intybus zingiber officinale. Capsicum annuum
-                        Grossum group amorphophallus_paeoniifolius celosia argentea. Brassica oleracea Acephala group
-                        brassica rapa pervidis or komatsuna group plectranthus spp.</p>
-                </div>
-            </div>
-            <div class="content__item" data-space="1.03" data-category="2">
-                <h3 class="content__item-title">Folding Life</h3>
-                <div class="content__item-details">
-                    <p class="content__meta">
-                        <span class="content__meta-item"><strong>Opening Hours:</strong> 7:30AM &mdash; 10:30PM</span>
-                        <span class="content__meta-item"><strong>Phone:</strong> (0) 66 2385641</span>
-                    </p>
-                    <p class="content__desc">Brassica rapa Pekinensis group crassocephalum spp ipomoea aquatica.
-                        Brassica napus Napobrassica group pachyrhizus ahipa.</p>
-                </div>
-            </div>
+            <?php foreach ($building->levels as $level) : ?>
+                <?php foreach ($level->spaces as $space) : ?>
+                    <?php foreach ($space->pointers as $index => $pointer) : ?>
+                        <div class="content__item"
+                             data-space="<?php echo $pointer->space->data; ?>"
+                             data-category="<?php echo $pointer->category_id; ?>">
+                            <h3 class="content__item-title"><?php echo $pointer->name; ?></h3>
+                            <div class="content__item-details">
+                                <p class="content__meta">
+                                    <span class="content__meta-item"><?php echo $pointer->meta; ?></span>
+                                </p>
+                                <p class="content__desc"><?php echo $pointer->description; ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+
         </div>
     </div>
 
@@ -413,12 +389,20 @@
             <label class="label__text">A - Z</label>
         </span>
         <ul class="list grouped-by-category">
-            <li class="list__item" data-level="1" data-category="1" data-space="1.08"><a href="#" class="list__link">The
-                    Wizard</a></li>
-            <li class="list__item" data-level="1" data-category="1" data-space="1.01"><a href="#" class="list__link">Apple
-                    Heart</a></li>
-            <li class="list__item" data-level="1" data-category="1" data-space="1.02"><a href="#" class="list__link">Crazy
-                    Banana</a></li>
+            <?php foreach ($building->levels as $level) : ?>
+                <?php foreach ($level->spaces as $space) : ?>
+                    <?php foreach ($space->pointers as $index => $pointer) : ?>
+                        <li class="list__item"
+                            data-level="<?php echo $level->level; ?>"
+                            data-category="<?php echo $pointer->category_id; ?>"
+                            data-space="<?php echo $pointer->space->data; ?>">
+                            <a href="#" class="list__link">
+                                <?php echo $pointer->name; ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
         </ul>
     </aside>
 
