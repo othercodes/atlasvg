@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers;
+namespace AtlasVG\Providers;
 
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
@@ -12,8 +12,8 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'App\Events\ExampleEvent' => [
-            'App\Listeners\ExampleListener',
+        'AtlasVG\Events\ExampleEvent' => [
+            'AtlasVG\Listeners\ExampleListener',
         ],
     ];
 }

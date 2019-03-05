@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace AtlasVG\Events;
 
 use Illuminate\Queue\SerializesModels;
 

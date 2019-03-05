@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers;
+namespace AtlasVG\Providers;
 
 use Illuminate\Support\ServiceProvider;
 

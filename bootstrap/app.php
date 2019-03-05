@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 try {
     (new Dotenv\Dotenv(dirname(__DIR__)))->load();
@@ -19,9 +19,8 @@ try {
 |
 */
 
-$app = new Laravel\Lumen\Application(
-    dirname(__DIR__)
-);
+$app = new Laravel\Lumen\Application(dirname(__DIR__));
+$app->configure('app');
 
 $app->withFacades();
 
@@ -40,12 +39,12 @@ $app->withEloquent();
 
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
-    App\Exceptions\Handler::class
+    AtlasVG\Exceptions\Handler::class
 );
 
 $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
-    App\Console\Kernel::class
+    AtlasVG\Console\Kernel::class
 );
 
 /*
@@ -60,11 +59,11 @@ $app->singleton(
 */
 
 // $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
+//     AtlasVG\Http\Middleware\ExampleMiddleware::class
 // ]);
 
 // $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
+//     'auth' => AtlasVG\Http\Middleware\Authenticate::class,
 // ]);
 
 /*
@@ -78,9 +77,9 @@ $app->singleton(
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
+$app->register(AtlasVG\Providers\AppServiceProvider::class);
+// $app->register(AtlasVG\Providers\AuthServiceProvider::class);
+// $app->register(AtlasVG\Providers\EventServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -94,9 +93,9 @@ $app->singleton(
 */
 
 $app->router->group([
-    'namespace' => 'App\Http\Controllers',
+    'namespace' => 'AtlasVG\Http\Controllers',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__ . '/../routes/web.php';
 });
 
 return $app;

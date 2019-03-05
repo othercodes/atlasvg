@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace AtlasVG\Http\Controllers;
 
 use Laravel\Lumen\Routing\Controller as BaseController;
 

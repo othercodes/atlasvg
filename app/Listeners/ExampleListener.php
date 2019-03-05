@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Listeners;
+namespace AtlasVG\Listeners;
 
-use App\Events\ExampleEvent;
+use AtlasVG\Events\ExampleEvent;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
