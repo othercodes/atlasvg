@@ -14,7 +14,7 @@ Now run composer to install all dependencies:
 compser install
 ```
 
-Once composer finish check the presence of `.env` and `database/satabase.sqlite` files.
+Once composer finish check the presence of `.env` and `database/database.sqlite` files.
 
 Run the following files if anyone is missing: 
 
