@@ -296,7 +296,7 @@
             <div class="levels">
                 @foreach ($building->levels as $level)
                     <div class="level level--{{ $level->level }}" data-level="L{{ $level->level }}">
-                        {!! $level->svg !!}
+                        {!! $level->svg->saveXML() !!}
                         <div class="level__pins">
                             @foreach ($level->spaces as $space)
                                 @foreach ($space->pointers as $index => $pointer)

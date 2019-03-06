@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateSpacesTable extends Migration
 {
@@ -15,8 +15,13 @@ class CreateSpacesTable extends Migration
     {
         Schema::create('spaces', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('data');
-
+            $table->string('type');
+            $table->float('data');
+            $table->float('x')->default(0.0);
+            $table->float('y')->default(0.0);
+            $table->float('width')->default(0.0);
+            $table->float('height')->default(0.0);
+            $table->float('radius')->default(0.0);
             $table->unsignedInteger('level_id');
             $table->foreign('level_id')
                 ->references('id')

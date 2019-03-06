@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Building
+ * @property int $id
  * @property string $name
  * @property string $description
  * @property string $surroundings
@@ -28,6 +29,7 @@ class Building extends Model
     protected $fillable = [
         'name',
         'description',
+        'surroundings'
     ];
 
     /**

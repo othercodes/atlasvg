@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Pointer
+ * @property int $id
  * @property string $name
  * @property string $meta
  * @property string $description
@@ -41,5 +42,14 @@ class Pointer extends Model
     public function space()
     {
         return $this->belongsTo('AtlasVG\Models\Space');
+    }
+
+    /**
+     * Get the space category
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function category()
+    {
+        return $this->belongsTo('AtlasVG\Models\Category');
     }
 }
