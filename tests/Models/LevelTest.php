@@ -18,7 +18,7 @@ class LevelTest extends TestCase
 
         $this->assertInstanceOf(Building::class, $level->building);
         $this->assertInstanceOf(Collection::class, $level->spaces);
-        $this->assertCount(7, $level->spaces);
+        $this->assertCount(6, $level->spaces);
 
     }
 }

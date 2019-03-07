@@ -1,7 +1,9 @@
 <?php
 
+use AtlasVG\Models\Category;
+use AtlasVG\Models\Level;
+use AtlasVG\Models\Space;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class PointersTableSeeder extends Seeder
 {
@@ -11,38 +13,28 @@ class PointersTableSeeder extends Seeder
      */
     public function run()
     {
-        $pointers = [
-            [
-                'id' => 1,
-                'name' => 'Pin for Apple Heart',
-                'meta' => 'Opening Hours: 6:30AM — 11:30PM Phone: (0) 66 5738902',
-                'description' => 'Burdock celery - salsify, tomatillo. Bitter gourd horseradish'
-                    . 'leaves radicchio, celeriac miner\'s lettuce kurrat arugula fluted pumpkin'
-                    . 'turnip, arracacha water spinach nopal.',
-                'top' => 60,
-                'left' => 8,
-                'space_id' => 1,
-                'category_id' => 1,
-                'created_at' => '2019-03-03 20:23:00',
-                'updated_at' => '2019-03-03 20:23:00',
-            ],
-            [
-                'id' => 2,
-                'name' => 'Which Bug?',
-                'meta' => 'Opening Hours: 7:30AM — 10:30PM Phone: (0) 66 8865001',
-                'description' => 'Sorrel garlic pigeon pea fava bean radish scorzonera lentil. Black-eyed '
-                    . 'pea samphire sorrel; lotus root arracacha lima bean celeriac chinese artichoke okra.',
-                'top' => 21,
-                'left' => 84,
-                'space_id' => 10,
-                'category_id' => 3,
-                'created_at' => '2019-03-03 20:23:00',
-                'updated_at' => '2019-03-03 20:23:00',
-            ]
-        ];
+        foreach (Level::all() as $level) {
 
-        foreach ($pointers as $pointer) {
-            DB::table('pointers')->insert($pointer);
+            /** @var Category $category */
+            $category = Category::inRandomOrder()->first();
+
+            /** @var Space $space */
+            $space = $level->spaces()->inRandomOrder()->first();
+            $center = $level->calculateRelativeSpaceCenter($space);
+
+            $pointer = new \AtlasVG\Models\Pointer([
+                'name' => 'Lorem ipsum dolor',
+                'meta' => 'Aliquam euismod leo justo, sit amet cursus justo aliquam et.',
+                'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus '
+                    . 'vestibulum mauris, et elementum mi commodo ut. Class aptent taciti sociosqu ad litora '
+                    . 'torquent per conubia nostra, per inceptos himenaeos. Mauris vestibulum tortor vel facilisis.',
+                'top' => $center['y'],
+                'left' => $center['x'],
+            ]);
+
+            $pointer->space()->associate($space);
+            $pointer->category()->associate($category);
+            $pointer->save();
         }
     }
 }

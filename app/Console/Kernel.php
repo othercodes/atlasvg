@@ -2,6 +2,7 @@
 
 namespace AtlasVG\Console;
 
+use AtlasVG\Console\Commands\Import;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
@@ -9,11 +10,10 @@ class Kernel extends ConsoleKernel
 {
     /**
      * The Artisan commands provided by your application.
-     *
      * @var array
      */
     protected $commands = [
-        //
+        Import::class
     ];
 
     /**
@@ -24,6 +24,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        $schedule->command('import:atlas')->everyMinute();
     }
 }

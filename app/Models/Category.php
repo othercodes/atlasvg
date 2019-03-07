@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Level
+ * @property int $id
  * @property string $name
  * @property string $color
  * @package AtlasVG\Models
