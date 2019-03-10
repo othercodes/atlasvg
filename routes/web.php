@@ -1,3 +1,3 @@
 <?php
 
-$router->get('/', 'AtlasVGController@index');
+$router->get('/[{bid}]', 'AtlasVGController@index');
