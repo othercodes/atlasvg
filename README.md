@@ -11,7 +11,7 @@ git clone git@github.com:othercodes/atlasvg.git
 Now run composer to install all dependencies:
 
 ```bash
-compser install
+composer install
 ```
 
 Once composer finish check the presence of `.env` and `database/database.sqlite` files.
