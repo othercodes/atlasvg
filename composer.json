@@ -11,12 +11,14 @@
   "type": "project",
   "require": {
     "php": ">=7.2.0",
+    "ext-libxml": "*",
     "ext-pdo": "*",
     "ext-json": "*",
-    "ext-sqlite3": "*",
     "ext-simplexml": "*",
-    "ext-libxml": "*",
+    "ext-sqlite3": "*",
     "laravel/lumen-framework": "5.7.*",
+    "league/oauth2-client": "^2.4",
+    "microsoft/microsoft-graph": "^1.6",
     "vlucas/phpdotenv": "~2.2"
   },
   "require-dev": {
