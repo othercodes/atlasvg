@@ -2,10 +2,14 @@
 
 namespace AtlasVG\Console\Commands;
 
-use Doctrine\Common\Inflector\Inflector;
+use AtlasVG\Models\Building;
+use AtlasVG\Models\Category;
+use AtlasVG\Models\Level;
+use AtlasVG\Models\Pointer;
+use AtlasVG\Models\Space;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class Import
@@ -33,49 +37,127 @@ class Import extends \Illuminate\Console\Command
     {
         try {
 
+            DB::beginTransaction();
+
             $file = storage_path('app/' . $this->argument('file'));
             if (!is_readable($file)) {
                 throw new \InvalidArgumentException('Unable to read/open file: ' . $file);
             }
 
-            $data = json_decode(file_get_contents($file));
+            $buildings = json_decode(file_get_contents($file));
             if (json_last_error() !== 0) {
                 throw new \Exception('Unable to decode json file due: ' . json_last_error_msg());
             }
 
-            foreach ($data as $key => $value) {
-                self::importFile($key, $value);
+            $this->info('Processing import file: ' . $file);
+
+            foreach ($buildings as $buildingIndex => $building) {
+                $this->info('> Importing building: ' . ($buildingIndex + 1));
+
+                /** @var Building $buildingDBModel */
+                $buildingDBModel = $this->saveModelOrNew($building, Building::class);
+
+                if (isset($building->levels)) {
+                    foreach ($building->levels as $levelIndex => $level) {
+                        $this->info('-> Importing level: ' . ($levelIndex + 1));
+
+                        /** @var Level $levelDBModel */
+                        $levelDBModel = $this->saveModelOrNew($level, Level::class, [
+                            $buildingDBModel
+                        ]);
+
+                        if (isset($level->pointers)) {
+                            foreach ($level->pointers as $pointerIndex => $pointer) {
+                                $this->info('-> Importing pointer: ' . ($pointerIndex + 1));
+
+                                /** @var Category $categoryDBModel */
+                                $categoryDBModel = isset($pointer->category_id)
+                                    ? Category::find($pointer->category_id)
+                                    : Category::find(1);
+
+                                /** @var Space $spaceDBModel */
+                                $spaceDBModel = isset($pointer->space_id)
+                                    ? Space::find($pointer->space_id)
+                                    : $levelDBModel->spaces()->first();
+
+                                if (!isset($pointer->left) && !isset($pointer->top)) {
+                                    $center = $levelDBModel->calculateRelativeSpaceCenter($spaceDBModel);
+
+                                    $pointer->top = $center['y'];
+                                    $pointer->left = $center['x'];
+                                }
+
+                                $pointerDBModel = $this->saveModelOrNew($pointer, Pointer::class, [
+                                    $categoryDBModel,
+                                    $spaceDBModel,
+                                ]);
+
+                            }
+                        }
+                    }
+                }
             }
 
+            $this->info("Done.");
+
+            DB::commit();
+
         } catch (\Exception $e) {
-            $this->error($e->getMessage());
+
+            $this->error($e->getMessage() . ' at ' . $e->getFile());
+            DB::rollBack();
         }
     }
 
     /**
-     * Process the import items to create the database models.
-     * @param string $field
-     * @param array|object $value
+     * Dynamic search to avoid duplicates
+     * @param object $data
+     * @param string $class
+     * @param Model[] $parents
+     * @return Model
      */
-    public static function importFile(string $field, $value): void
+    private function saveModelOrNew(object $data, string $class, array $parents = []): Model
     {
-        switch (gettype($value)) {
-            case 'object':
+        if (isset($data->id)) {
 
-                $model = '\AtlasVG\Models\\' . ucfirst(Inflector::singularize($field));
+            /** @var Builder $class */
+            $model = $class::find($data->id);
+        } else {
 
-                /** @var Model $instance */
-                $instance =  new $model(get_object_vars($value));
-                $instance->save();
-
-                break;
-            case 'array':
-
-                foreach ($value as $index => $item) {
-                    self::importFile(is_int($index) ? $field : $index, $item);
+            /** @var Builder $class */
+            $query = $class::select();
+            foreach ($data as $field => $value) {
+                if (is_scalar($value) && !in_array($field, ['svg', 'surroundings'])) {
+                    $query->where($field, '=', $value);
                 }
+            }
 
-                break;
+            /** @var Model $model */
+            $model = $query->first();
         }
+
+        if (!isset($model)) {
+            /** @var Model $model */
+            $model = new $class();
+        }
+
+        $model->fill(get_object_vars($data));
+
+        foreach ($parents as $parent) {
+            if (isset($parent)) {
+                $relation = substr(strrchr(get_class($parent), "\\"), 1);
+                $model->{strtolower($relation)}()
+                    ->associate($parent);
+            }
+        }
+
+        $model->save();
+
+        if (method_exists($model, 'discover')) {
+            call_user_func_array([$model, 'discover'], []);
+        }
+
+        return $model;
     }
+
 }

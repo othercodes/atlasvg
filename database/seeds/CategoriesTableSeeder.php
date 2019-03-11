@@ -12,10 +12,6 @@ class CategoriesTableSeeder extends Seeder
     {
         $categories = [
             new \AtlasVG\Models\Category([
-                'name' => 'Uncategorized',
-                'color' => '#e8e8e8',
-            ]),
-            new \AtlasVG\Models\Category([
                 'name' => 'Food',
                 'color' => '#dc4b7c',
             ]),

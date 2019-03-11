@@ -20,6 +20,8 @@ class CreateCategoriesTable extends Migration
             $table->string('color', 7);
             $table->timestamps();
         });
+
+        (new \AtlasVG\Models\Category(['name' => 'Uncategorized', 'color' => '#e8e8e8',]))->save();
     }
 
     /**

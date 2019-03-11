@@ -1,6 +1,6 @@
 <?php
 
-namespace AtlasVG;
+namespace AtlasVG\Models;
 
 use Illuminate\Auth\Authenticatable;
 use Laravel\Lumen\Auth\Authorizable;
