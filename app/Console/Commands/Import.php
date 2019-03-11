@@ -68,7 +68,7 @@ class Import extends \Illuminate\Console\Command
 
                         if (isset($level->pointers)) {
                             foreach ($level->pointers as $pointerIndex => $pointer) {
-                                $this->info('-> Importing pointer: ' . ($pointerIndex + 1));
+                                $this->info('--> Importing pointer: ' . ($pointerIndex + 1));
 
                                 /** @var Category $categoryDBModel */
                                 $categoryDBModel = isset($pointer->category_id)
