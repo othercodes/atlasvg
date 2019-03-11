@@ -8,6 +8,7 @@ use Microsoft\Graph\Graph;
 use Microsoft\Graph\Model;
 
 class SyncController extends Controller {
+
     public function sync() {
 
         $tokenCache = new TokenCache();
@@ -17,6 +18,8 @@ class SyncController extends Controller {
         $graph->setAccessToken($accessToken);
 
         # currently filtering by office location
+        # TODO: handle cases if office location is not specified
+        # TODO: handle cleaning & escaping special characters in OFFICE_LOCATION
         $queryParams = array(
             '$select' => 'givenName,surname,jobTitle,department,userPrincipalName',
             '$filter' => 'officeLocation eq ' . env('OFFICE_LOCATION'),

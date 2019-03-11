@@ -9,8 +9,9 @@ use Microsoft\Graph\Graph;
 use Microsoft\Graph\Model;
 
 class AuthController extends Controller {
+
     public function signin() {
-        
+
         $oauthClient = new \League\OAuth2\Client\Provider\GenericProvider([
             'clientId' => env('OAUTH_APP_ID'),
             'clientSecret' => env('OAUTH_APP_PASSWORD'),
@@ -23,7 +24,7 @@ class AuthController extends Controller {
 
         $authUrl = $oauthClient->getAuthorizationUrl();
 
-        # redirect to AAD passing this app's client id and secret, 
+        # redirect to AAD passing this app's client id and secret,
         # o365 will call callback() in case of successful auth
         # providing code that can be used to generate a token
         return redirect($authUrl);
@@ -70,7 +71,7 @@ class AuthController extends Controller {
             } catch (League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
                 # TODO: error handling if something is wrong with the token
                 # for now silently redirecting to /
-                return redirect('/')
+                return redirect('/');
             }
         }
 

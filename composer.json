@@ -16,7 +16,7 @@
     "ext-simplexml": "*",
     "ext-sqlite3": "*",
     "laravel/lumen-framework": "5.7.*",
-    "league/oauth2-client": "dev-master",
+    "league/oauth2-client": "^2.4",
     "microsoft/microsoft-graph": "^1.6",
     "vlucas/phpdotenv": "~2.2"
   },

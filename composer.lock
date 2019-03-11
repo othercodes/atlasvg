@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "412d3d56b3fe9dc36d30ebbdb35aeb2d",
+    "content-hash": "647f914eb18b4ba5375045522da74b18",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -1504,16 +1504,16 @@
         },
         {
             "name": "league/oauth2-client",
-            "version": "dev-master",
+            "version": "2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/oauth2-client.git",
-                "reference": "552c940c65b2310615b3cc4c0328798011a7e268"
+                "reference": "cc114abc622a53af969e8664722e84ca36257530"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/oauth2-client/zipball/552c940c65b2310615b3cc4c0328798011a7e268",
-                "reference": "552c940c65b2310615b3cc4c0328798011a7e268",
+                "url": "https://api.github.com/repos/thephpleague/oauth2-client/zipball/cc114abc622a53af969e8664722e84ca36257530",
+                "reference": "cc114abc622a53af969e8664722e84ca36257530",
                 "shasum": ""
             },
             "require": {
@@ -1567,7 +1567,7 @@
                 "oauth2",
                 "single sign on"
             ],
-            "time": "2019-03-04T22:28:04+00:00"
+            "time": "2018-11-22T18:33:57+00:00"
         },
         {
             "name": "microsoft/microsoft-graph",
@@ -4589,9 +4589,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "league/oauth2-client": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

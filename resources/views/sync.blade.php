@@ -4,7 +4,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   </head>
-
   <body>
     <main role="main" class="container">
     <h1>Sync</h1>
