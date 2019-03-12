@@ -21,7 +21,7 @@ class Import
      * @param array $buildings
      * @return \Generator
      */
-    public static function data(array $buildings)
+    public static function data(array $buildings): \Generator
     {
         foreach ($buildings as $buildingIndex => $building) {
 
@@ -65,7 +65,7 @@ class Import
                                 $pointer->left = $center['x'];
                             }
 
-                            $pointerDBModel = self::saveModelOrNew($pointer, Pointer::class, [
+                            self::saveModelOrNew($pointer, Pointer::class, [
                                 $categoryDBModel,
                                 $spaceDBModel,
                             ]);
