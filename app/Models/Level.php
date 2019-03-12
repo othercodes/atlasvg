@@ -83,10 +83,26 @@ class Level extends Model
     }
 
     /**
-     * @param \SimpleXMLElement $svg
+     * Load the svg as SimpleXMLIterator
+     * @param \SimpleXMLElement|string $svg
      */
-    public function setSvgAttribute(\SimpleXMLElement $svg)
+    public function setSvgAttribute($svg)
     {
+        $data_is_url = false;
+        if (is_string($svg)) {
+
+            if (is_readable($svg)) {
+                $data_is_url = true;
+            }
+
+            $svg = new SimpleXMLIterator($svg, LIBXML_COMPACT, $data_is_url);
+        }
+
+        if (!($svg instanceof \SimpleXMLElement)) {
+            throw new \InvalidArgumentException('Invalid argument svg, must be instance of '
+                . 'SimpleXMLIterator, a valid path to a svg file or a valid svg/xml string.');
+        }
+
         $this->attributes['sign'] = md5($svg->saveXML());
         $this->attributes['svg'] = $svg->saveXML();
     }
@@ -151,12 +167,22 @@ class Level extends Model
      */
     public function discover(): Collection
     {
+        $viewBox = explode(' ', $this->svg['viewBox']);
+        $this->buildSpaceModel([
+            'type' => 'svg',
+            'data' => (float)$this->id,
+            'x' => (float)0.0,
+            'y' => (float)0.0,
+            'width' => (float)$viewBox[2],
+            'height' => (float)$viewBox[3],
+        ]);
+
         foreach ($this->svg as $node) {
             if (isset($node[$this->spaceAttribute])) {
                 switch ($node->getName()) {
                     case 'rect':
                         if ($this->validate($node, ['x', 'y', 'width', 'height'])) {
-                            $space = new Space([
+                            $this->buildSpaceModel([
                                 'type' => $node->getName(),
                                 'data' => (float)$node[$this->spaceAttribute],
                                 'x' => (float)$node['x'],
@@ -169,7 +195,7 @@ class Level extends Model
                         break;
                     case 'circle':
                         if ($this->validate($node, ['cx', 'cy', 'r'])) {
-                            $space = new Space([
+                            $this->buildSpaceModel([
                                 'type' => $node->getName(),
                                 'data' => (float)$node[$this->spaceAttribute],
                                 'x' => (float)$node['cx'],
@@ -182,14 +208,42 @@ class Level extends Model
                     default:
                         continue 2;
                 }
-
-                $space->level()->associate($this);
-                $space->save();
-
             }
         }
 
         return $this->spaces;
+    }
+
+    /**
+     * Dynamically search and build a space model
+     * @param $attributes
+     * @return Space
+     */
+    private function buildSpaceModel($attributes): Model
+    {
+        $is_new = false;
+        $query = Space::where('level_id', '=', $this->id);
+        foreach ($attributes as $field => $value) {
+            if (is_scalar($value)) {
+                $query->where($field, '=', $value);
+            }
+        }
+
+        $space = $query->first();
+        if (!isset($space)) {
+            $space = new Space();
+            $is_new = true;
+        }
+
+        $space->fill($attributes);
+
+        if ($is_new) {
+            $space->level()
+                ->associate($this)
+                ->save();
+        }
+
+        return $space;
     }
 
     /**
@@ -217,7 +271,7 @@ class Level extends Model
 
         return [
             'x' => (int)(($center['x'] * 100.00) / $viewBox[2]) - $this->xDeviation,
-            'y' => (int)(($center['y'] * 66.667) / $viewBox[3]) - $this->yDeviation,
+            'y' => (int)(($center['y'] * ($viewBox[3] * 100 / $viewBox[2])) / $viewBox[3]) - $this->yDeviation,
         ];
     }
 

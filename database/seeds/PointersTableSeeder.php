@@ -19,7 +19,7 @@ class PointersTableSeeder extends Seeder
             $category = Category::inRandomOrder()->first();
 
             /** @var Space $space */
-            $space = $level->spaces()->inRandomOrder()->first();
+            $space = $level->spaces()->where('type', '<>', 'svg')->inRandomOrder()->first();
             $center = $level->calculateRelativeSpaceCenter($space);
 
             $pointer = new \AtlasVG\Models\Pointer([

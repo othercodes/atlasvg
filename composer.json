@@ -13,6 +13,7 @@
     "php": ">=7.2.0",
     "ext-libxml": "*",
     "ext-pdo": "*",
+    "ext-json": "*",
     "ext-simplexml": "*",
     "ext-sqlite3": "*",
     "laravel/lumen-framework": "5.7.*",

@@ -4,6 +4,7 @@ namespace AtlasVG\Models;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use SimpleXMLIterator;
 
 /**
  * Class Building
@@ -29,7 +30,7 @@ class Building extends Model
     protected $fillable = [
         'name',
         'description',
-        'surroundings'
+        'surroundings',
     ];
 
     /**
@@ -39,5 +40,38 @@ class Building extends Model
     public function levels()
     {
         return $this->hasMany('AtlasVG\Models\Level');
+    }
+
+    /**
+     * @param string $surroundings
+     * @return SimpleXMLIterator
+     */
+    public function getSurroundingsAttribute($surroundings)
+    {
+        return new SimpleXMLIterator($surroundings, LIBXML_COMPACT);
+    }
+
+    /**
+     * Load the svg as SimpleXMLIterator
+     * @param \SimpleXMLElement|string $surroundings
+     */
+    public function setSurroundingsAttribute($surroundings)
+    {
+        $data_is_url = false;
+        if (is_string($surroundings)) {
+
+            if (is_readable($surroundings)) {
+                $data_is_url = true;
+            }
+
+            $surroundings = new SimpleXMLIterator($surroundings, LIBXML_COMPACT, $data_is_url);
+        }
+
+        if (!($surroundings instanceof \SimpleXMLElement)) {
+            throw new \InvalidArgumentException('Invalid argument surroundings, must be instance of '
+                . 'SimpleXMLIterator, a valid path to a svg file or a valid svg/xml string.');
+        }
+
+        $this->attributes['surroundings'] = $surroundings->saveXML();
     }
 }

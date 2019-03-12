@@ -17,7 +17,7 @@ class LevelsTableSeeder extends Seeder
                     'name' => 'L' . ($index + 1),
                     'level' => $index + 1,
                     'description' => 'Floor ' . ($index + 1),
-                    'svg' => new SimpleXMLIterator($map, LIBXML_COMPACT, true),
+                    'svg' => $map,
                 ]);
 
                 $level->building()->associate($building);

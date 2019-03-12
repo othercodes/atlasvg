@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreatePointersTable extends Migration
 {
@@ -15,10 +15,15 @@ class CreatePointersTable extends Migration
         Schema::create('pointers', function (Blueprint $table) {
             $table->increments('id')
                 ->unsigned();
-
-            $table->string('name');
-            $table->string('meta');
-            $table->text('description');
+            $table->string('name')
+                ->default('Pointer')
+                ->nullable();
+            $table->string('meta')
+                ->default('Meta')
+                ->nullable();
+            $table->text('description')
+                ->default('Description')
+                ->nullable();
 
             $table->string('top')
                 ->comment('css vmin unit');

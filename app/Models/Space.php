@@ -66,6 +66,7 @@ class Space extends Model
     public function calculateArea(): float
     {
         switch ($this->type) {
+            case'svg':
             case'rect':
                 return round($this->width * $this->height, 2);
                 break;
@@ -84,6 +85,7 @@ class Space extends Model
     public function calculateCenter(): array
     {
         switch ($this->type) {
+            case 'svg':
             case 'rect':
                 return [
                     'x' => (float)($this->x + ($this->width / 2)),

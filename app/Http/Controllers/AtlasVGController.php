@@ -7,9 +7,14 @@ use AtlasVG\Models\Category;
 
 class AtlasVGController extends Controller
 {
-    public function index()
+    /**
+     * Main index view
+     * @param int $bid
+     * @return \Illuminate\View\View
+     */
+    public function index(int $bid = 1)
     {
-        $building = Building::select()->first();
+        $building = Building::find($bid);
         $categories = Category::all();
 
         return view('main', [
