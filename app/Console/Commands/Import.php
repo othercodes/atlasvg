@@ -2,7 +2,9 @@
 
 namespace AtlasVG\Console\Commands;
 
+use AtlasVG\Models\Building;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Import
@@ -30,8 +32,6 @@ class Import extends \Illuminate\Console\Command
     {
         try {
 
-            DB::beginTransaction();
-
             if (!is_readable($this->argument('file'))) {
                 throw new \InvalidArgumentException('Unable to read file: ' . $this->argument('file'));
             }
@@ -46,7 +46,11 @@ class Import extends \Illuminate\Console\Command
             $bar = $this->output->createProgressBar(count($buildings));
             $bar->start();
 
+            DB::beginTransaction();
+
+            /** @var Building $building */
             foreach (\AtlasVG\Services\Import::data($buildings) as $building) {
+                Log::info("Building processed: ID: {$building->id} Name: {$building->name}");
                 $bar->advance();
             }
 

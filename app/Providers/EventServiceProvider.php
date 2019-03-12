@@ -12,8 +12,8 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'AtlasVG\Events\ExampleEvent' => [
-            'AtlasVG\Listeners\ExampleListener',
+        'Illuminate\Log\Events\MessageLogged' => [
+            'AtlasVG\Listeners\MessageLoggedListener',
         ],
     ];
 }
