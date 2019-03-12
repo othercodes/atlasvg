@@ -9,6 +9,7 @@ use AtlasVG\Models\Pointer;
 use AtlasVG\Models\Space;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Import
@@ -23,13 +24,24 @@ class DBData
      */
     public static function import(array $buildings): \Generator
     {
+        Log::info("Incoming amount of buildings: " . count($buildings));
         foreach ($buildings as $buildingIndex => $building) {
+
+            Log::info("Processing building index {$buildingIndex}", [
+                'building' => $buildings
+            ]);
 
             /** @var Building $buildingDBModel */
             $buildingDBModel = self::saveModelOrNew($building, Building::class);
 
             if (isset($building['levels'])) {
+
+                Log::info("Amount of levels for building {$buildingIndex}: " . count($building['levels']));
                 foreach ($building['levels'] as $levelIndex => $level) {
+
+                    Log::info("Processing level index {$levelIndex}", [
+                        'level' => $level
+                    ]);
 
                     /** @var Level $levelDBModel */
                     $levelDBModel = self::saveModelOrNew($level, Level::class, [
@@ -37,7 +49,13 @@ class DBData
                     ]);
 
                     if (isset($level['pointers'])) {
+
+                        Log::info("Amount of pointers for level {$levelIndex}: " . count($level['pointers']));
                         foreach ($level['pointers'] as $pointerIndex => $pointer) {
+
+                            Log::info("Processing pointer index {$pointerIndex}", [
+                                'pointer' => $pointer
+                            ]);
 
                             /** @var Category $categoryDBModel */
                             $categoryDBModel = self::saveModelOrNew(
@@ -74,6 +92,8 @@ class DBData
                 }
             }
 
+            Log::info("Import building index {$buildingIndex} done!");
+
             yield $buildingDBModel;
         }
     }
@@ -89,9 +109,14 @@ class DBData
     {
         if (isset($data['id'])) {
 
+            Log::info("Trying to load {$class} by id {$data['id']} for update operation.");
+
             /** @var Builder $class */
             $model = $class::find($data['id']);
+
         } else {
+
+            Log::info("Trying to load {$class} by params for update operation.");
 
             /** @var Builder $class */
             $query = $class::select();
@@ -107,6 +132,8 @@ class DBData
                 $query->where($relation . '_id', '=', $parent->id);
             }
 
+            Log::debug("Search query by params: {$query->toSql()}.");
+
             /** @var Model $model */
             $model = $query->first();
         }
@@ -114,19 +141,33 @@ class DBData
         if (!isset($model)) {
             /** @var Model $model */
             $model = new $class();
+            Log::info("Item {$class} not found id database, creating new item {$class}.");
+        } else {
+            Log::info("Item {$class} found, performing 'update' operation.");
         }
 
         $model->fill($data);
 
-        foreach ($parents as $parent) {
-            $relation = substr(strrchr(get_class($parent), "\\"), 1);
-            $model->{strtolower($relation)}()
-                ->associate($parent);
+        if (count($parents) > 0) {
+            Log::info("Processing parents of {$class}.");
+
+            foreach ($parents as $parent) {
+
+                $relation = substr(strrchr(get_class($parent), "\\"), 1);
+                Log::info("Associating {$class} with {$relation}.");
+
+                $model->{strtolower($relation)}()->associate($parent);
+            }
         }
 
         $model->save();
 
+        Log::info("Saved item {$class}.", [
+            'model' => $model->toJson()
+        ]);
+
         if (method_exists($model, 'discover')) {
+            Log::info("Executing discover() over item {$class}.");
             call_user_func_array([$model, 'discover'], []);
         }
 

@@ -50,17 +50,17 @@ class Import extends \Illuminate\Console\Command
 
             /** @var Building $building */
             foreach (\AtlasVG\Helpers\DBData::import($buildings) as $building) {
-                Log::info("Building processed: ID: {$building->id} Name: {$building->name}");
                 $bar->advance();
             }
 
-            $this->info("\nDone.");
-
             DB::commit();
+
+            $this->info("\nDone.");
 
         } catch (\Exception $e) {
 
-            $this->error($e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
+            $this->error('Unable to perform import task due: ' . $e->getMessage());
+            Log::error('Import task fail due: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
 
             DB::rollBack();
         }
