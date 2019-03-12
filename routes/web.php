@@ -1,6 +1,6 @@
 <?php
 
 $router->get('/[{bid}]', 'AtlasVGController@index');
-$router->get('/signin', 'AuthController@signin');
-$router->get('/callback', 'AuthController@callback');
-$router->get('/sync', 'SyncController@sync');
+$router->get('/app/signin', 'AuthController@signin');
+$router->get('/app/callback', 'AuthController@callback');
+$router->get('/app/sync', 'SyncController@sync');

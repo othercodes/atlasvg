@@ -271,7 +271,7 @@ class Level extends Model
 
         return [
             'x' => (int)(($center['x'] * 100.00) / $viewBox[2]) - $this->xDeviation,
-            'y' => (int)(($center['y'] * 66.667) / $viewBox[3]) - $this->yDeviation,
+            'y' => (int)(($center['y'] * ($viewBox[3] * 100 / $viewBox[2])) / $viewBox[3]) - $this->yDeviation,
         ];
     }
 
