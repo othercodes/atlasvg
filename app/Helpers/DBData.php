@@ -1,6 +1,6 @@
 <?php
 
-namespace AtlasVG\Services;
+namespace AtlasVG\Helpers;
 
 use AtlasVG\Models\Building;
 use AtlasVG\Models\Category;
@@ -14,43 +14,43 @@ use Illuminate\Database\Eloquent\Model;
  * Class Import
  * @package AtlasVG\Services
  */
-class Import
+class DBData
 {
     /**
      * Import the data into the system
      * @param array $buildings
      * @return \Generator
      */
-    public static function data(array $buildings): \Generator
+    public static function import(array $buildings): \Generator
     {
         foreach ($buildings as $buildingIndex => $building) {
 
             /** @var Building $buildingDBModel */
             $buildingDBModel = self::saveModelOrNew($building, Building::class);
 
-            if (isset($building->levels)) {
-                foreach ($building->levels as $levelIndex => $level) {
+            if (isset($building['levels'])) {
+                foreach ($building['levels'] as $levelIndex => $level) {
 
                     /** @var Level $levelDBModel */
                     $levelDBModel = self::saveModelOrNew($level, Level::class, [
                         $buildingDBModel
                     ]);
 
-                    if (isset($level->pointers)) {
-                        foreach ($level->pointers as $pointerIndex => $pointer) {
+                    if (isset($level['pointers'])) {
+                        foreach ($level['pointers'] as $pointerIndex => $pointer) {
 
                             /** @var Category $categoryDBModel */
                             $categoryDBModel = self::saveModelOrNew(
-                                isset($pointer->category)
-                                    ? $pointer->category
-                                    : (object)['id' => 1],
+                                isset($pointer['category'])
+                                    ? $pointer['category']
+                                    : ['id' => 1],
                                 Category::class
                             );
 
                             /** @var Space $spaceDBModel */
-                            $spaceDBModel = isset($pointer->space)
+                            $spaceDBModel = isset($pointer['space'])
                                 ? Space::where('level_id', '=', $levelDBModel->id)
-                                    ->where('data', '=', $pointer->space)
+                                    ->where('data', '=', $pointer['space'])
                                     ->first()
                                 : $levelDBModel->spaces()->first();
 
@@ -58,11 +58,10 @@ class Import
                                 continue;
                             }
 
-                            if (!isset($pointer->left) && !isset($pointer->top)) {
+                            if (!isset($pointer['left']) && !isset($pointer['top'])) {
                                 $center = $levelDBModel->calculateRelativeSpaceCenter($spaceDBModel);
-
-                                $pointer->top = $center['y'];
-                                $pointer->left = $center['x'];
+                                $pointer['top'] = $center['y'];
+                                $pointer['left'] = $center['x'];
                             }
 
                             self::saveModelOrNew($pointer, Pointer::class, [
@@ -81,17 +80,17 @@ class Import
 
     /**
      * Dynamic search to avoid duplicates
-     * @param object|int $data
+     * @param array $data
      * @param string $class
      * @param Model[] $parents
      * @return Model
      */
-    private static function saveModelOrNew(object $data, string $class, array $parents = []): Model
+    private static function saveModelOrNew(array $data, string $class, array $parents = []): Model
     {
-        if (isset($data->id)) {
+        if (isset($data['id'])) {
 
             /** @var Builder $class */
-            $model = $class::find($data->id);
+            $model = $class::find($data['id']);
         } else {
 
             /** @var Builder $class */
@@ -117,7 +116,7 @@ class Import
             $model = new $class();
         }
 
-        $model->fill(get_object_vars($data));
+        $model->fill($data);
 
         foreach ($parents as $parent) {
             $relation = substr(strrchr(get_class($parent), "\\"), 1);

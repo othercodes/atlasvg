@@ -36,7 +36,7 @@ class Import extends \Illuminate\Console\Command
                 throw new \InvalidArgumentException('Unable to read file: ' . $this->argument('file'));
             }
 
-            $buildings = json_decode(file_get_contents($this->argument('file')));
+            $buildings = json_decode(file_get_contents($this->argument('file')), true);
             if (json_last_error() !== 0) {
                 throw new \Exception('Unable to decode json file due: ' . json_last_error_msg());
             }
@@ -49,7 +49,7 @@ class Import extends \Illuminate\Console\Command
             DB::beginTransaction();
 
             /** @var Building $building */
-            foreach (\AtlasVG\Services\Import::data($buildings) as $building) {
+            foreach (\AtlasVG\Helpers\DBData::import($buildings) as $building) {
                 Log::info("Building processed: ID: {$building->id} Name: {$building->name}");
                 $bar->advance();
             }
