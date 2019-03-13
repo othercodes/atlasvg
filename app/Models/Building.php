@@ -11,7 +11,7 @@ use SimpleXMLIterator;
  * @property int $id
  * @property string $name
  * @property string $description
- * @property string $surroundings
+ * @property string $svg
  * @property Collection|Level[] $levels
  * @package AtlasVG\Models
  */
@@ -30,7 +30,27 @@ class Building extends Model
     protected $fillable = [
         'name',
         'description',
-        'surroundings',
+        'svg',
+    ];
+
+    /**
+     * The attributes that should be visible in arrays.
+     * @var array
+     */
+    protected $visible = [
+        'id',
+        'name',
+        'description',
+        'map',
+        'levels',
+    ];
+
+    /**
+     * The relations to eager load on every query.
+     * @var array
+     */
+    protected $with = [
+        'levels'
     ];
 
     /**
@@ -43,35 +63,35 @@ class Building extends Model
     }
 
     /**
-     * @param string $surroundings
+     * @param string $svg
      * @return SimpleXMLIterator
      */
-    public function getSurroundingsAttribute($surroundings)
+    public function getSvgAttribute($svg)
     {
-        return new SimpleXMLIterator($surroundings, LIBXML_COMPACT);
+        return new SimpleXMLIterator($svg, LIBXML_COMPACT);
     }
 
     /**
      * Load the svg as SimpleXMLIterator
-     * @param \SimpleXMLElement|string $surroundings
+     * @param \SimpleXMLElement|string $svg
      */
-    public function setSurroundingsAttribute($surroundings)
+    public function setSvgAttribute($svg)
     {
         $data_is_url = false;
-        if (is_string($surroundings)) {
+        if (is_string($svg)) {
 
-            if (is_readable($surroundings)) {
+            if (is_readable($svg)) {
                 $data_is_url = true;
             }
 
-            $surroundings = new SimpleXMLIterator($surroundings, LIBXML_COMPACT, $data_is_url);
+            $svg = new SimpleXMLIterator($svg, LIBXML_COMPACT, $data_is_url);
         }
 
-        if (!($surroundings instanceof \SimpleXMLElement)) {
-            throw new \InvalidArgumentException('Invalid argument surroundings, must be instance of '
+        if (!($svg instanceof \SimpleXMLElement)) {
+            throw new \InvalidArgumentException('Invalid argument svg, must be instance of '
                 . 'SimpleXMLIterator, a valid path to a svg file or a valid svg/xml string.');
         }
 
-        $this->attributes['surroundings'] = $surroundings->saveXML();
+        $this->attributes['svg'] = $svg->saveXML();
     }
 }

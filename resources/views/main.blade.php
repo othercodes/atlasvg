@@ -291,7 +291,7 @@
         <!-- Map -->
         <div class="mall">
             <div class="surroundings">
-                <div class="surroundings__map">{!! $building->surroundings->saveXML() !!}</div>
+                <div class="surroundings__map">{!! $building->svg->saveXML() !!}</div>
             </div>
             <div class="levels">
                 @foreach ($building->levels as $level)

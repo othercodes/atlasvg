@@ -18,6 +18,15 @@ use Illuminate\Support\Facades\Log;
 class DBData
 {
     /**
+     * Return the export array (let the magic happens)
+     * @return array
+     */
+    public static function export(): array
+    {
+        return Building::all()->toArray();
+    }
+
+    /**
      * Import the data into the system
      * @param array $buildings
      * @return \Generator

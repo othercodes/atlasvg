@@ -27,6 +27,14 @@ class Level extends Model
     protected $table = 'levels';
 
     /**
+     * The attributes that should be cast to native types.
+     * @var array
+     */
+    protected $casts = [
+        'level' => 'integer',
+    ];
+
+    /**
      * Mass assignable
      * @var array
      */
@@ -35,6 +43,26 @@ class Level extends Model
         'level',
         'description',
         'svg',
+    ];
+
+    /**
+     * The attributes that should be visible in arrays.
+     * @var array
+     */
+    protected $visible = [
+        'id',
+        'name',
+        'level',
+        'description',
+        'pointers',
+    ];
+
+    /**
+     * The relations to eager load on every query.
+     * @var array
+     */
+    protected $with = [
+        'pointers'
     ];
 
     /**
@@ -71,6 +99,15 @@ class Level extends Model
     public function spaces()
     {
         return $this->hasMany('AtlasVG\Models\Space');
+    }
+
+    /**
+     * Get the pointer for the current level
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function pointers()
+    {
+        return $this->hasManyThrough('AtlasVG\Models\Pointer', 'AtlasVG\Models\Space');
     }
 
     /**
@@ -114,7 +151,6 @@ class Level extends Model
     public function setSpaceAttribute(string $spaceAttribute): Level
     {
         $this->spaceAttribute = $spaceAttribute;
-        return $this;
     }
 
     /**

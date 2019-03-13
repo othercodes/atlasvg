@@ -24,6 +24,15 @@ class Pointer extends Model
     protected $table = 'pointers';
 
     /**
+     * The attributes that should be cast to native types.
+     * @var array
+     */
+    protected $casts = [
+        'top' => 'double',
+        'left' => 'double',
+    ];
+
+    /**
      * Mass assignable
      * @var array
      */
@@ -33,6 +42,27 @@ class Pointer extends Model
         'description',
         'top',
         'left',
+    ];
+
+    /**
+     * The attributes that should be visible in arrays.
+     * @var array
+     */
+    protected $visible = [
+        'name',
+        'meta',
+        'description',
+        'top',
+        'left',
+        'category',
+    ];
+
+    /**
+     * The relations to eager load on every query.
+     * @var array
+     */
+    protected $with = [
+        'category'
     ];
 
     /**

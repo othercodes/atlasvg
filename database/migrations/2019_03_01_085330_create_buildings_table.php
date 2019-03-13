@@ -18,7 +18,7 @@ class CreateBuildingsTable extends Migration
 
             $table->string('name');
             $table->text('description');
-            $table->text('surroundings');
+            $table->text('svg');
             $table->timestamps();
         });
     }
