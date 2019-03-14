@@ -28,8 +28,8 @@ class Pointer extends Model
      * @var array
      */
     protected $casts = [
-        'top' => 'double',
-        'left' => 'double',
+        'top' => 'float',
+        'left' => 'float',
     ];
 
     /**

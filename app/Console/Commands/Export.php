@@ -34,7 +34,7 @@ class Export extends \Illuminate\Console\Command
 
             $bytes = file_put_contents(
                 $this->argument('file'),
-                json_encode(DBData::export(), JSON_PRETTY_PRINT)
+                json_encode(DBData::export(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
             );
 
             if (is_bool($bytes) || $bytes === 0) {

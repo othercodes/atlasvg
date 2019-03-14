@@ -43,6 +43,7 @@ class Level extends Model
         'level',
         'description',
         'svg',
+        'map',
     ];
 
     /**
@@ -54,7 +55,16 @@ class Level extends Model
         'name',
         'level',
         'description',
+        'map',
         'pointers',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     * @var array
+     */
+    protected $appends = [
+        'map'
     ];
 
     /**
@@ -146,9 +156,8 @@ class Level extends Model
 
     /**
      * @param string $spaceAttribute
-     * @return Level
      */
-    public function setSpaceAttribute(string $spaceAttribute): Level
+    public function setSpaceAttribute(string $spaceAttribute)
     {
         $this->spaceAttribute = $spaceAttribute;
     }
@@ -159,6 +168,27 @@ class Level extends Model
     public function getSpaceAttribute(): string
     {
         return $this->spaceAttribute;
+    }
+
+    /**
+     * Get surroundings map path
+     * @return string
+     */
+    public function getMapAttribute()
+    {
+        $path = resource_path("maps/b{$this->building->id}.l{$this->id}.svg");
+        $this->svg->saveXML($path);
+
+        return $this->attributes['map'] = $path;
+    }
+
+    /**
+     * Proxy to handle map import
+     * @param string $map
+     */
+    public function setMapAttribute(string $map)
+    {
+        $this->setSvgAttribute($map);
     }
 
     /**

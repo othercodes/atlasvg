@@ -11,7 +11,7 @@ use SimpleXMLIterator;
  * @property int $id
  * @property string $name
  * @property string $description
- * @property string $svg
+ * @property \SimpleXMLElement|string $svg
  * @property Collection|Level[] $levels
  * @package AtlasVG\Models
  */
@@ -31,6 +31,7 @@ class Building extends Model
         'name',
         'description',
         'svg',
+        'map',
     ];
 
     /**
@@ -43,6 +44,14 @@ class Building extends Model
         'description',
         'map',
         'levels',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     * @var array
+     */
+    protected $appends = [
+        'map'
     ];
 
     /**
@@ -93,5 +102,26 @@ class Building extends Model
         }
 
         $this->attributes['svg'] = $svg->saveXML();
+    }
+
+    /**
+     * Get surroundings map path
+     * @return string
+     */
+    public function getMapAttribute()
+    {
+        $path = resource_path("maps/b{$this->id}.surroundings.svg");
+        $this->svg->saveXML($path);
+
+        return $this->attributes['map'] = $path;
+    }
+
+    /**
+     * Proxy to handle map import
+     * @param string $map
+     */
+    public function setMapAttribute(string $map)
+    {
+        $this->setSvgAttribute($map);
     }
 }
