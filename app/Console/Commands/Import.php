@@ -50,8 +50,11 @@ class Import extends \Illuminate\Console\Command
 
             /** @var Building $building */
             foreach (\AtlasVG\Helpers\DBData::import($buildings) as $building) {
+                Log::debug("Building ID{$building->id} {$building->name} imported");
                 $bar->advance();
             }
+
+            $bar->finish();
 
             DB::commit();
 

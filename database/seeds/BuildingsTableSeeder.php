@@ -16,7 +16,7 @@ class BuildingsTableSeeder extends Seeder
         $building = new \AtlasVG\Models\Building([
             'name' => 'Sample Mall',
             'description' => 'Some fake mall.',
-            'surroundings' => $surrounding,
+            'svg' => $surrounding,
         ]);
         $building->save();
     }

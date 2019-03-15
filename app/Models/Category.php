@@ -29,6 +29,16 @@ class Category extends Model
     ];
 
     /**
+     * The attributes that should be visible in arrays.
+     * @var array
+     */
+    protected $visible = [
+        'id',
+        'name',
+        'color',
+    ];
+
+    /**
      * Get the pointers in the given category
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */

@@ -27,6 +27,14 @@ class Level extends Model
     protected $table = 'levels';
 
     /**
+     * The attributes that should be cast to native types.
+     * @var array
+     */
+    protected $casts = [
+        'level' => 'integer',
+    ];
+
+    /**
      * Mass assignable
      * @var array
      */
@@ -35,6 +43,36 @@ class Level extends Model
         'level',
         'description',
         'svg',
+        'map',
+    ];
+
+    /**
+     * The attributes that should be visible in arrays.
+     * @var array
+     */
+    protected $visible = [
+        'id',
+        'name',
+        'level',
+        'description',
+        'map',
+        'pointers',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     * @var array
+     */
+    protected $appends = [
+        'map'
+    ];
+
+    /**
+     * The relations to eager load on every query.
+     * @var array
+     */
+    protected $with = [
+        'pointers'
     ];
 
     /**
@@ -74,6 +112,15 @@ class Level extends Model
     }
 
     /**
+     * Get the pointer for the current level
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function pointers()
+    {
+        return $this->hasManyThrough('AtlasVG\Models\Pointer', 'AtlasVG\Models\Space');
+    }
+
+    /**
      * @param string $svg
      * @return SimpleXMLIterator
      */
@@ -109,12 +156,10 @@ class Level extends Model
 
     /**
      * @param string $spaceAttribute
-     * @return Level
      */
-    public function setSpaceAttribute(string $spaceAttribute): Level
+    public function setSpaceAttribute(string $spaceAttribute)
     {
         $this->spaceAttribute = $spaceAttribute;
-        return $this;
     }
 
     /**
@@ -123,6 +168,27 @@ class Level extends Model
     public function getSpaceAttribute(): string
     {
         return $this->spaceAttribute;
+    }
+
+    /**
+     * Get surroundings map path
+     * @return string
+     */
+    public function getMapAttribute()
+    {
+        $path = resource_path("maps/b{$this->building->id}.l{$this->id}.svg");
+        $this->svg->saveXML($path);
+
+        return $this->attributes['map'] = $path;
+    }
+
+    /**
+     * Proxy to handle map import
+     * @param string $map
+     */
+    public function setMapAttribute(string $map)
+    {
+        $this->setSvgAttribute($map);
     }
 
     /**
