@@ -49,12 +49,22 @@ class Pointer extends Model
      * @var array
      */
     protected $visible = [
+        'id',
         'name',
         'meta',
         'description',
         'top',
         'left',
+        'room',
         'category',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     * @var array
+     */
+    protected $appends = [
+        'room'
     ];
 
     /**
@@ -81,5 +91,14 @@ class Pointer extends Model
     public function category()
     {
         return $this->belongsTo('AtlasVG\Models\Category');
+    }
+
+    /**
+     * Get the assigned space data as room property
+     * @return float
+     */
+    public function getRoomAttribute()
+    {
+        return $this->space->data;
     }
 }

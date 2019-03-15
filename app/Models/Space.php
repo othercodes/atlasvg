@@ -28,6 +28,19 @@ class Space extends Model
     protected $table = 'spaces';
 
     /**
+     * The attributes that should be cast to native types.
+     * @var array
+     */
+    protected $casts = [
+        'data' => 'float',
+        'x' => 'float',
+        'y' => 'float',
+        'width' => 'float',
+        'height' => 'float',
+        'radius' => 'float',
+    ];
+
+    /**
      * Mass assignable
      * @var array
      */

@@ -19,11 +19,13 @@ class DBData
 {
     /**
      * Return the export array (let the magic happens)
-     * @return array
+     * @return \Generator
      */
-    public static function export(): array
+    public static function export(): \Generator
     {
-        return Building::all()->toArray();
+        foreach (Building::all() as $building) {
+            yield $building->toArray();
+        }
     }
 
     /**
@@ -75,9 +77,9 @@ class DBData
                             );
 
                             /** @var Space $spaceDBModel */
-                            $spaceDBModel = isset($pointer['space'])
+                            $spaceDBModel = isset($pointer['room'])
                                 ? Space::where('level_id', '=', $levelDBModel->id)
-                                    ->where('data', '=', $pointer['space'])
+                                    ->where('data', '=', $pointer['room'])
                                     ->first()
                                 : $levelDBModel->spaces()->first();
 
@@ -130,7 +132,7 @@ class DBData
             /** @var Builder $class */
             $query = $class::select();
             foreach ($data as $field => $value) {
-                if (is_scalar($value) && !in_array($field, ['svg', 'surroundings', 'space'])) {
+                if (is_scalar($value) && !in_array($field, ['svg', 'surroundings', 'space', 'room'])) {
                     $query->where($field, '=', $value);
                 }
             }

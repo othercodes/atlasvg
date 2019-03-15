@@ -2,8 +2,6 @@
 
 namespace AtlasVG\Console\Commands;
 
-use AtlasVG\Helpers\DBData;
-
 /**
  * Class Export
  * @package AtlasVG\Console\Commands
@@ -32,16 +30,29 @@ class Export extends \Illuminate\Console\Command
 
             $this->info('Exporting data into file: ' . $this->argument('file'));
 
+            $export = [];
+
+            $bar = $this->output->createProgressBar();
+            $bar->start();
+
+            /** @var array $building */
+            foreach (\AtlasVG\Helpers\DBData::export() as $building) {
+                $export[] = $building;
+                $bar->advance();
+            }
+
+            $bar->finish();
+
             $bytes = file_put_contents(
                 $this->argument('file'),
-                json_encode(DBData::export(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
             );
 
             if (is_bool($bytes) || $bytes === 0) {
                 throw new \Exception('Unable to save exported data, please check the export path.');
             }
 
-            $this->info('Done!');
+            $this->info("\nDone.");
 
         } catch (\Exception $e) {
             $this->error($e->getMessage() . ' at ' . $e->getFile());
