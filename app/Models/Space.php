@@ -55,6 +55,21 @@ class Space extends Model
     ];
 
     /**
+     * The attributes that should be visible in serialization.
+     * @var array
+     */
+    protected $visible = [
+        'id',
+        'type',
+        'data',
+        'x',
+        'y',
+        'width',
+        'height',
+        'radius',
+    ];
+
+    /**
      * Get the level that holds the space
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

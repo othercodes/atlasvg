@@ -77,7 +77,11 @@ class Building extends Model
      */
     public function getSvgAttribute($svg)
     {
-        return new SimpleXMLIterator($svg, LIBXML_COMPACT);
+        if (isset($svg)) {
+            return new SimpleXMLIterator($svg, LIBXML_COMPACT);
+        }
+
+        return null;
     }
 
     /**
@@ -111,7 +115,9 @@ class Building extends Model
     public function getMapAttribute()
     {
         $path = resource_path("maps/b{$this->id}.surroundings.svg");
-        $this->svg->saveXML($path);
+        if (isset($this->svg)) {
+            $this->svg->saveXML($path);
+        }
 
         return $this->attributes['map'] = $path;
     }
