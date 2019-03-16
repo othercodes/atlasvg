@@ -112,7 +112,7 @@ class Building extends Model
      * Get surroundings map path
      * @return string
      */
-    public function getMapAttribute($svg)
+    public function getMapAttribute()
     {
         $path = resource_path("maps/b{$this->id}.surroundings.svg");
         if (isset($this->svg)) {
