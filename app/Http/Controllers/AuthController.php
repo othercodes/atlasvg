@@ -66,7 +66,7 @@ class AuthController extends Controller {
                 $tokenCache->storeTokens($accessToken, $user);
 
                 # once auth is done and token successfully saved in db, we can repeatedly sync through /sync
-                return redirect('/sync');
+                return redirect('/app/sync');
 
             } catch (League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
                 # TODO: error handling if something is wrong with the token
