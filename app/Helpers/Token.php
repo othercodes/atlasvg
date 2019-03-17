@@ -1,10 +1,10 @@
 <?php
 
-namespace AtlasVG\TokenStore;
+namespace AtlasVG\Helpers;
 
 use AtlasVG\Models\AuthData;
 
-class TokenCache {
+class Token {
 
     /**
      * saves token info for a successfully authenticated user

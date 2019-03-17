@@ -363,7 +363,8 @@
                                 <p class="content__meta">
                                     <span class="content__meta-item">{{ $pointer->meta }}</span>
                                 </p>
-                                <p class="content__desc">{{ $pointer->description }}</p>
+                                <!-- !! disables XSS prevention thought htmlspecialchars() (https://laravel.com/docs/5.8/blade#displaying-data), might need a better solution to have line breaks -->
+                                <p class="content__desc">{!! $pointer->description !!}</p>
                             </div>
                         </div>
                     @endforeach
