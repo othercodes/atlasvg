@@ -14,5 +14,6 @@ class Kernel extends ConsoleKernel
         \AtlasVG\Console\Commands\Import::class,
         \AtlasVG\Console\Commands\Export::class,
         \AtlasVG\Console\Commands\ShowItems::class,
+        \AtlasVG\Console\Commands\Sync::class,
     ];
 }
