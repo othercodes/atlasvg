@@ -25,9 +25,11 @@ class CreatePointersTable extends Migration
                 ->default('Description')
                 ->nullable();
 
-            $table->string('top')
+            $table->float('top')
+                ->default(0)
                 ->comment('css vmin unit');
             $table->string('left')
+                ->float(0)
                 ->comment('css vmin unit');
 
             $table->unsignedInteger('space_id');

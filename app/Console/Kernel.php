@@ -12,5 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \AtlasVG\Console\Commands\Import::class,
+        \AtlasVG\Console\Commands\Export::class,
+        \AtlasVG\Console\Commands\ShowItems::class,
     ];
 }
