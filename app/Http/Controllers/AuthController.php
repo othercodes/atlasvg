@@ -3,7 +3,7 @@
 namespace AtlasVG\Http\Controllers;
 
 use AtlasVG\Http\Controllers\Controller;
-use AtlasVG\TokenStore\TokenCache;
+use AtlasVG\Helpers\Token;
 use Illuminate\Http\Request;
 use Microsoft\Graph\Graph;
 use Microsoft\Graph\Model;
@@ -62,8 +62,8 @@ class AuthController extends Controller {
                     ->setReturnType(Model\User::class)
                     ->execute();
 
-                $tokenCache = new TokenCache();
-                $tokenCache->storeTokens($accessToken, $user);
+                $token = new Token();
+                $token->storeTokens($accessToken, $user);
 
                 # once auth is done and token successfully saved in db, we can repeatedly sync through /sync
                 return redirect('/app/sync');

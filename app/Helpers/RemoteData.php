@@ -3,7 +3,7 @@
 namespace AtlasVG\Helpers;
 
 use AtlasVG\Models\Pointer;
-use AtlasVG\TokenStore\TokenCache;
+use AtlasVG\Helpers\Token;
 use Illuminate\Support\Facades\Log;
 use Microsoft\Graph\Graph;
 
@@ -12,12 +12,14 @@ use Microsoft\Graph\Graph;
 class RemoteData
 {
     /**
+     * Sync info for all existing pointers
+     * @return array $result counts of successful and failed syncs
      */
     public static function sync()
     {
         
-        $tokenCache = new TokenCache();
-        $accessToken = $tokenCache->getAccessToken();
+        $token = new Token();
+        $accessToken = $token->getAccessToken();
 
         $graph = new Graph();
         $graph->setAccessToken($accessToken);
@@ -34,12 +36,11 @@ class RemoteData
 
         $getUsersUrl = '/me/people?' . http_build_query($queryParams);
 
-        $users = $graph->createRequest('GET', $getUsersUrl)
+        $response = $graph->createRequest('GET', $getUsersUrl)
             ->addHeaders(array("Content-Type" => "application/json"))
             ->execute();
 
-        $users_cleaned = $users->getBody()['value'];
-        $collection = collect($users_cleaned);
+        $users = collect($response->getBody()['value']);
 
         $result = array(
             "total" => Pointer::count(),
@@ -47,12 +48,12 @@ class RemoteData
             "failed"=> 0
         );
 
-        # damn closures
-        Pointer::all()->each(function (Pointer $pointer) use ($collection, &$result) {
+        # TODO: get only pointers with category "Person"
+        Pointer::all()->each(function (Pointer $pointer) use ($users, &$result) {
 
-            $filtered = $collection->filter(function($value) use ($pointer){
+            $filtered = $users->filter(function($value) use ($pointer){
 
-                if ($value['userPrincipalName'] == $pointer->meta) {
+                if (strtolower($value['userPrincipalName']) == strtolower($pointer->meta)) {
                     return true;
                 }
             });
