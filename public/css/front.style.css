@@ -5,6 +5,11 @@
     box-sizing: border-box;
 }
 
+html,
+body {
+    height: 100%;
+}
+
 .clearfix::before,
 .clearfix::after {
     content: '';
@@ -23,7 +28,9 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-a {
+a,
+a:hover,
+a:visited {
     text-decoration: none;
     color: #aaa;
     outline: none;
@@ -38,6 +45,10 @@ button:hover {
 a:focus,
 button:focus {
     outline: none;
+}
+
+.no-buildings  {
+    padding-top: 20px;
 }
 
 .hidden {
@@ -387,7 +398,6 @@ button:focus {
 .content__meta-item {
     display: inline-block;
     padding: 0 0.25em;
-    color: #f00;
 }
 
 .content__meta .icon {
