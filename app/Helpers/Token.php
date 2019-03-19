@@ -30,8 +30,11 @@ class Token {
      */
     public function getAccessToken() {
 
-        # TODO: redirect to signin if possible or return error if auth not found in db
         $authdata = AuthData::select()->first();
+
+        if (!$authdata) {
+            throw new \Exception("No authentication data found, please go to /app/signin to log in.");
+        }
 
         // token is valid for only 1h, we need to use refreshToken to regenerate it
         // just in case setting current time += 5 minutes (to allow for time differences)

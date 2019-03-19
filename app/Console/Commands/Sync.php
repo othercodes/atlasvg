@@ -12,13 +12,13 @@ class Sync extends \Illuminate\Console\Command
      * The console command name.
      * @var string
      */
-    protected $signature = "atlasvg:sync {building_id}";
+    protected $signature = "atlasvg:sync {bid}";
 
     /**
      * The console command description.
      * @var string
      */
-    protected $description = "Synchronize all pointers for {building_id}.";
+    protected $description = "Synchronizes all pointers for a building.";
 
     /**
      * Execute the console command.
@@ -28,12 +28,14 @@ class Sync extends \Illuminate\Console\Command
     {
         try {
 
-            $id = $this->argument('building_id');
-            $result = \AtlasVG\Helpers\RemoteData::sync($id);
+            $result = \AtlasVG\Helpers\RemoteData::sync($this->argument('bid'));
             $total = $result['successful'] + $result['failed'];
 
             $this->info("Successfully synchronized {$result['successful']}/{$total} people.");
-            $this->error("Failed to synchronize {$result['failed']}/{$total} people. Check the logs for details.");
+
+            if ($result['failed']) {
+                $this->error("Failed to synchronize {$result['failed']}/{$total} people. Check the logs for details.");
+            }
 
         } catch (\Exception $e) {
             $this->error($e->getMessage());

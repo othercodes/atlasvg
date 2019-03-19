@@ -15,31 +15,24 @@ class RemoteData
      * Sync info for all existing pointers
      * @return array $result counts of successful and failed syncs
      */
-    public static function sync($building_id)
+    public static function sync($bid)
     {
         
-        $building = Building::where('id', $building_id)->first();
-
-        if (!$building->location) {
-            throw new \Exception("Location is for building #{$building_id} is not defined, cannot perform sync.");
-        }
-
         $token = new Token();
         $accessToken = $token->getAccessToken();
 
         $graph = new Graph();
         $graph->setAccessToken($accessToken);
 
-        
+        $building = Building::find($bid);
 
+        if (!$building->location) {
+            throw new \Exception("Location is for building #{$building_id} is not defined, cannot perform sync.");
+        }
 
-
-        # currently filtering by office location
-        # TODO: handle cases if office location is not specified
-        # TODO: handle cleaning & escaping special characters in OFFICE_LOCATION
         $queryParams = array(
             '$select' => 'givenName,surname,jobTitle,department,userPrincipalName',
-            '$filter' => 'officeLocation eq ' . $building->location,
+            '$filter' => "officeLocation eq '$building->location'",
             '$top' => 1000,
         );
 
@@ -56,7 +49,8 @@ class RemoteData
             "failed"=> 0
         );
 
-        foreach (Building::find($building_id)->levels as $level) {
+        foreach ($building->levels as $level) {
+
             foreach (Level::find($level->id)->pointers as $pointer) {
 
                 # syncing data only for people
@@ -73,7 +67,7 @@ class RemoteData
 
                     if ($match) {
 
-                        Log::info("Found user: {$match['userPrincipalName']}.");
+                        Log::info("Found a user: {$match['userPrincipalName']}.");
 
                         $pointer->name = "{$match['givenName']} {$match['surname']}";
                         $pointer->description = "Job Title: {$match['jobTitle']} <br> Department: {$match['department']}";
