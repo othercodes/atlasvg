@@ -3,34 +3,43 @@
 namespace AtlasVG\Helpers;
 
 use AtlasVG\Models\Pointer;
+use AtlasVG\Models\Building;
+use AtlasVG\Models\Level;
 use AtlasVG\Helpers\Token;
 use Illuminate\Support\Facades\Log;
 use Microsoft\Graph\Graph;
 
-/**
- */
 class RemoteData
 {
     /**
      * Sync info for all existing pointers
      * @return array $result counts of successful and failed syncs
      */
-    public static function sync()
+    public static function sync($building_id)
     {
         
+        $building = Building::where('id', $building_id)->first();
+
+        if (!$building->location) {
+            throw new \Exception("Location is for building #{$building_id} is not defined, cannot perform sync.");
+        }
+
         $token = new Token();
         $accessToken = $token->getAccessToken();
 
         $graph = new Graph();
         $graph->setAccessToken($accessToken);
 
+        
+
+
+
         # currently filtering by office location
         # TODO: handle cases if office location is not specified
         # TODO: handle cleaning & escaping special characters in OFFICE_LOCATION
         $queryParams = array(
             '$select' => 'givenName,surname,jobTitle,department,userPrincipalName',
-            '$filter' => 'officeLocation eq ' . env('OFFICE_LOCATION'),
-            '$orderby' => 'givenName ASC',
+            '$filter' => 'officeLocation eq ' . $building->location,
             '$top' => 1000,
         );
 
@@ -43,42 +52,46 @@ class RemoteData
         $users = collect($response->getBody()['value']);
 
         $result = array(
-            "total" => Pointer::count(),
             "successful" => 0,
             "failed"=> 0
         );
 
-        # TODO: get only pointers with category "Person"
-        Pointer::all()->each(function (Pointer $pointer) use ($users, &$result) {
+        foreach (Building::find($building_id)->levels as $level) {
+            foreach (Level::find($level->id)->pointers as $pointer) {
 
-            $filtered = $users->filter(function($value) use ($pointer){
+                # syncing data only for people
+                if ($pointer->category->name == 'Person') {
 
-                if (strtolower($value['userPrincipalName']) == strtolower($pointer->meta)) {
-                    return true;
+                    $filtered = $users->filter(function($value) use ($pointer){
+
+                        if (strtolower($value['userPrincipalName']) == strtolower($pointer->meta)) {
+                            return true;
+                        }
+                    });
+
+                    $match = $filtered->first();
+
+                    if ($match) {
+
+                        Log::info("Found user: {$match['userPrincipalName']}.");
+
+                        $pointer->name = "{$match['givenName']} {$match['surname']}";
+                        $pointer->description = "Job Title: {$match['jobTitle']} <br> Department: {$match['department']}";
+                        $pointer->save();
+
+                        $result['successful']++;
+
+                    } else {
+
+                        Log::critical("Couldn't find user with email: {$pointer->meta}.");
+                        $result['failed']++;
+
+                    }
+
                 }
-            });
-
-            $match = $filtered->first();
-
-            if ($match) {
-
-                Log::info("Found user: {$match['userPrincipalName']}.");
-
-                $pointer->name = "{$match['givenName']} {$match['surname']}";
-                $pointer->description = "Job Title: {$match['jobTitle']} <br> Department: {$match['department']}";
-                $pointer->save();
-
-                $result['successful']++;
-
-            } else {
-
-                Log::critical("Couldn't find user with email: {$pointer->meta}.");
-                $result['failed']++;
-
             }
-        });
+        }
 
         return $result;
-
     }
 }
