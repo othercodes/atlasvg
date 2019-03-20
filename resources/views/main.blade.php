@@ -8,6 +8,7 @@
     @include('css.categories')
     @include('css.pointers')
     <link rel="stylesheet" type="text/css" href="{{URL::to('/')}}/css/bootstrap.min.css">
+    @include('css.environment')
     <link rel="stylesheet" type="text/css" href="{{URL::to('/')}}/css/front.style.css"/>
     <script type="text/javascript" src="{{URL::to('/')}}/js/modernizr-custom.js"></script>
 </head>
