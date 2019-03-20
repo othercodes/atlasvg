@@ -1,5 +1,8 @@
 # AtlasVG
 
+[![Build Status](https://travis-ci.com/othercodes/atlasvg.svg?branch=master)](https://travis-ci.com/othercodes/atlasvg) [![codecov](https://codecov.io/gh/othercodes/atlasvg/branch/master/graph/badge.svg)](https://codecov.io/gh/othercodes/atlasvg)
+
+
 ## Requirements
 
 * php >= 7.2
