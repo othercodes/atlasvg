@@ -106,15 +106,11 @@ button:focus {
 .surroundings,
 .levels {
     position: absolute;
-    top: 50%;
+    top: 35%;
     left: 50%;
 }
 
 .surroundings {
-    width: 192vmin;
-    /* double of mall map */
-    height: 128vmin;
-    margin: -64vmin 0 0 -96vmin;
     pointer-events: none;
     -webkit-transition: opacity 0.8s;
     transition: opacity 0.8s;
@@ -133,9 +129,6 @@ button:focus {
 }
 
 .levels {
-    width: 96vmin;
-    height: 64vmin;
-    margin: -32vmin 0 0 -48vmin;
     -webkit-transition: -webkit-transform 0.3s;
     transition: transform 0.3s;
     -webkit-transform-style: preserve-3d;

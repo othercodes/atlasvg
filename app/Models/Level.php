@@ -79,13 +79,13 @@ class Level extends Model
      * Deviation for x
      * @var float
      */
-    private $xDeviation = 3.0;
+    private $xDeviation = 1.0;
 
     /**
      * deviation for y
      * @var float
      */
-    private $yDeviation = 0.0;
+    private $yDeviation = -1.5;
 
     /**
      * The attribute that define which element of the svg is an "habitable" space.
@@ -249,7 +249,19 @@ class Level extends Model
             'height' => (float)$viewBox[3],
         ]);
 
-        foreach ($this->svg as $node) {
+        $this->parse($this->svg);
+
+        return $this->spaces()->get();
+    }
+
+    /**
+     * Parse the svg file to extract the spaces
+     * @param \SimpleXMLElement $parent
+     */
+    protected function parse(\SimpleXMLElement $parent): void
+    {
+        /** @var SimpleXMLIterator $node */
+        foreach ($parent as $node) {
             if (isset($node[$this->spaceAttribute])) {
                 switch ($node->getName()) {
                     case 'rect':
@@ -262,9 +274,10 @@ class Level extends Model
                                 'width' => (float)$node['width'],
                                 'height' => (float)$node['height'],
                             ]);
-                        }
 
+                        }
                         break;
+
                     case 'circle':
                         if ($this->validate($node, ['cx', 'cy', 'r'])) {
                             $this->buildSpaceModel([
@@ -274,16 +287,18 @@ class Level extends Model
                                 'y' => (float)$node['cy'],
                                 'radius' => (float)$node['r']
                             ]);
-                        }
 
+                        }
                         break;
                     default:
-                        continue 2;
+                        continue;
                 }
             }
-        }
 
-        return $this->spaces;
+            if (count($node->children()) > 0) {
+                $this->parse($node->children());
+            }
+        }
     }
 
     /**
@@ -310,9 +325,7 @@ class Level extends Model
         $space->fill($attributes);
 
         if ($is_new) {
-            $space->level()
-                ->associate($this)
-                ->save();
+            $space->level()->associate($this)->save();
         }
 
         return $space;
@@ -347,4 +360,19 @@ class Level extends Model
         ];
     }
 
+    /**
+     * Return the width and height of the level
+     * @return array
+     */
+    public function calculateRelativeWidthAndHeight(): array
+    {
+        $viewBox = explode(' ', $this->svg['viewBox']);
+
+        return [
+            'left' => 100 / 2,
+            'top' => $viewBox[3] * 100 / $viewBox[2] / 2,
+            'width' => 100,
+            'height' => $viewBox[3] * 100 / $viewBox[2],
+        ];
+    }
 }
