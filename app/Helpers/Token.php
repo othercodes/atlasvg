@@ -60,7 +60,7 @@ class Token {
                     'refresh_token' => $authdata->refreshToken,
                 ]);
 
-                # updating token in db for future use
+                # storing new tokens for the same building
                 $this->updateTokens($newToken, $authdata);
 
                 return $newToken->getToken();
