@@ -3,6 +3,7 @@
 namespace AtlasVG\Helpers;
 
 use AtlasVG\Models\AuthData;
+use Illuminate\Support\Facades\Log;
 
 class Token {
 
@@ -10,27 +11,27 @@ class Token {
      * saves token info for a successfully authenticated user
      * @param object $accessToken
      * @param object $user
+     * @param int $bid
      */
-    public function storeTokens($accessToken, $user) {
+    public function storeTokens($accessToken, $user, $bid) {
 
-        $authdata = new \AtlasVG\Models\AuthData([
-            'accessToken' => $accessToken->getToken(),
+        $authdata = AuthData::updateOrCreate(
+            ['building_id' => $bid],
+            ['accessToken' => $accessToken->getToken(),
             'refreshToken' => $accessToken->getRefreshToken(),
             'tokenExpires' => $accessToken->getExpires(),
             'userName' => $user->getDisplayName(),
-            'userEmail' => null !== $user->getMail() ? $user->getMail() : $user->getUserPrincipalName(),
-        ]);
-
-        $authdata->save();
+            'userEmail' => null !== $user->getMail() ? $user->getMail() : $user->getUserPrincipalName()]
+        );
     }
 
     /**
      * returns a valid token
      * @return string $accessToken
      */
-    public function getAccessToken() {
+    public function getAccessToken($bid) {
 
-        $authdata = AuthData::select()->first();
+        $authdata = AuthData::where('building_id', '=', $bid)->first();
 
         if (!$authdata) {
             throw new \Exception("No authentication data found, please go to /app/signin to log in.");
@@ -54,12 +55,13 @@ class Token {
             ]);
 
             try {
+
                 $newToken = $oauthClient->getAccessToken('refresh_token', [
                     'refresh_token' => $authdata->refreshToken,
                 ]);
 
                 # updating token in db for future use
-                $this->updateTokens($newToken);
+                $this->updateTokens($newToken, $authdata);
 
                 return $newToken->getToken();
             } catch (League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
@@ -75,11 +77,9 @@ class Token {
     /**
      * updates token data in db
      * @param object $accessToken
+     * @param object $authdata
      */
-    public function updateTokens($accessToken) {
-
-        # TODO: currently ignoring multiple entries in AuthData table, needs redesign
-        $authdata = AuthData::select()->first();
+    private function updateTokens($accessToken, $authdata) {
 
         $authdata->accessToken = $accessToken->getToken();
         $authdata->refreshToken = $accessToken->getRefreshToken();

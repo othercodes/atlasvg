@@ -15,20 +15,27 @@ class RemoteData
      * Sync info for all existing pointers
      * @return array $result counts of successful and failed syncs
      */
-    public static function sync($bid)
+    public static function sync($bid = null)
     {
-        
-        $token = new Token();
-        $accessToken = $token->getAccessToken();
 
-        $graph = new Graph();
-        $graph->setAccessToken($accessToken);
+        if (!$bid) {
+            $bid = Building::select()->first()->id;
+        # if building id is specified but doesn't exist throwing 404
+        } elseif (!Building::find($bid)) {
+            throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+        }
 
         $building = Building::find($bid);
 
         if (!$building->location) {
-            throw new \Exception("Location is for building #{$building_id} is not defined, cannot perform sync.");
+            throw new \Exception("Location is for building #{$bid} is not defined, cannot perform sync.");
         }
+
+        $token = new Token();
+        $accessToken = $token->getAccessToken($bid);
+
+        $graph = new Graph();
+        $graph->setAccessToken($accessToken);
 
         $queryParams = array(
             '$select' => 'givenName,surname,jobTitle,department,userPrincipalName',
@@ -51,7 +58,7 @@ class RemoteData
 
         foreach ($building->levels as $level) {
 
-            foreach (Level::find($level->id)->pointers as $pointer) {
+            foreach ($level->pointers as $pointer) {
 
                 # syncing data only for people
                 if ($pointer->category->name == 'Person') {
@@ -77,7 +84,7 @@ class RemoteData
 
                     } else {
 
-                        Log::critical("Couldn't find user with email: {$pointer->meta}.");
+                        Log::error("Couldn't find user with email: {$pointer->meta}.");
                         $result['failed']++;
 
                     }

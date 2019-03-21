@@ -6,7 +6,7 @@ use AtlasVG\Http\Controllers\Controller;
 
 class SyncController extends Controller {
 
-    public function sync(int $bid = 1) {
+    public function sync($bid = null) {
 
         $result = \AtlasVG\Helpers\RemoteData::sync($bid);
         

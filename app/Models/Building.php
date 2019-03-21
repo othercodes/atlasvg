@@ -66,6 +66,15 @@ class Building extends Model
     ];
 
     /**
+     * Get authentication data for Sync
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function authdata()
+    {
+        return $this->hasOne('AtlasVG\Models\AuthData');
+    }
+
+    /**
      * Get the levels for the building
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
