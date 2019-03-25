@@ -4,524 +4,565 @@
  *
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
- * 
+ *
  * Copyright 2016, Codrops
  * http://www.codrops.com
  */
-;(function(window) {
+;(function (window) {
 
-	'use strict';
+    'use strict';
 
-	// helper functions
-	// from https://davidwalsh.name/vendor-prefix
-	var prefix = (function () {
-		var styles = window.getComputedStyle(document.documentElement, ''),
-			pre = (Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o']))[1],
-			dom = ('WebKit|Moz|MS|O').match(new RegExp('(' + pre + ')', 'i'))[1];
-		
-		return {
-			dom: dom,
-			lowercase: pre,
-			css: '-' + pre + '-',
-			js: pre[0].toUpperCase() + pre.substr(1)
-		};
-	})();
-	
-	// vars & stuff
-	var support = {transitions : Modernizr.csstransitions},
-		transEndEventNames = {'WebkitTransition': 'webkitTransitionEnd', 'MozTransition': 'transitionend', 'OTransition': 'oTransitionEnd', 'msTransition': 'MSTransitionEnd', 'transition': 'transitionend'},
-		transEndEventName = transEndEventNames[Modernizr.prefixed('transition')],
-		onEndTransition = function(el, callback, propTest) {
-			var onEndCallbackFn = function( ev ) {
-				if( support.transitions ) {
-					if( ev.target != this || propTest && ev.propertyName !== propTest && ev.propertyName !== prefix.css + propTest ) return;
-					this.removeEventListener( transEndEventName, onEndCallbackFn );
-				}
-				if( callback && typeof callback === 'function' ) { callback.call(this); }
-			};
-			if( support.transitions ) {
-				el.addEventListener( transEndEventName, onEndCallbackFn );
-			}
-			else {
-				onEndCallbackFn();
-			}
-		},
-		// the mall element
-		mall = document.querySelector('.mall'),
-		// mall´s levels wrapper
-		mallLevelsEl = mall.querySelector('.levels'),
-		// mall´s levels
-		mallLevels = [].slice.call(mallLevelsEl.querySelectorAll('.level')),
-		// total levels
-		mallLevelsTotal = mallLevels.length,
-		// surroundings elems
-		mallSurroundings = [].slice.call(mall.querySelectorAll('.surroundings')),
-		// selected level position
-		selectedLevel,
-		// navigation element wrapper
-		mallNav = document.querySelector('.mallnav'),
-		// show all mall´s levels ctrl
-		allLevelsCtrl = mallNav.querySelector('.mallnav__button--all-levels'),
-		// levels navigation up/down ctrls
-		levelUpCtrl = mallNav.querySelector('.mallnav__button--up'),
-		levelDownCtrl = mallNav.querySelector('.mallnav__button--down'),
-		// pins
-		pins = [].slice.call(mallLevelsEl.querySelectorAll('.pin')),
-		// content element
-		contentEl = document.querySelector('.content'),
-		// content close ctrl
-		contentCloseCtrl = contentEl.querySelector('button.content__button'),
-		// check if a content item is opened
-		isOpenContentArea,
-		// check if currently animating/navigating
-		isNavigating,
-		// check if all levels are shown or if one level is shown (expanded)
-		isExpanded,
-		// spaces list element
-		spacesListEl = document.getElementById('spaces-list'),
-		// spaces list ul
-		spacesEl = spacesListEl.querySelector('ul.list'),
-		// all the spaces listed
-		spaces = [].slice.call(spacesEl.querySelectorAll('.list__item > a.list__link')),
-		// reference to the current shows space (name set in the data-name attr of both the listed spaces and the pins on the map)
-		spaceref,
-		// sort by ctrls
-		sortByNameCtrl = document.querySelector('#sort-by-name'),
-		// listjs initiliazation (all mall´s spaces)
-		spacesList = new List('spaces-list', { valueNames: ['list__link', { data: ['level'] }, { data: ['category'] } ]} ),
+    // helper functions
+    // from https://davidwalsh.name/vendor-prefix
+    var prefix = (function () {
+        var styles = window.getComputedStyle(document.documentElement, ''),
+            pre = (Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o']))[1],
+            dom = ('WebKit|Moz|MS|O').match(new RegExp('(' + pre + ')', 'i'))[1];
 
-		// smaller screens:
-		// open search ctrl
-		openSearchCtrl = document.querySelector('button.open-search'),
-		// main container
-		containerEl = document.querySelector('.container'),
-		// close search ctrl
-		closeSearchCtrl = spacesListEl.querySelector('button.close-search');
+        return {
+            dom: dom,
+            lowercase: pre,
+            css: '-' + pre + '-',
+            js: pre[0].toUpperCase() + pre.substr(1)
+        };
+    })();
 
-	function init() {
-		// init/bind events
-		initEvents();
-	}
+    // vars & stuff
+    var support = {transitions: Modernizr.csstransitions},
+        transEndEventNames = {
+            'WebkitTransition': 'webkitTransitionEnd',
+            'MozTransition': 'transitionend',
+            'OTransition': 'oTransitionEnd',
+            'msTransition': 'MSTransitionEnd',
+            'transition': 'transitionend'
+        },
+        transEndEventName = transEndEventNames[Modernizr.prefixed('transition')],
+        onEndTransition = function (el, callback, propTest) {
+            var onEndCallbackFn = function (ev) {
+                if (support.transitions) {
+                    if (ev.target != this || propTest && ev.propertyName !== propTest && ev.propertyName !== prefix.css + propTest) return;
+                    this.removeEventListener(transEndEventName, onEndCallbackFn);
+                }
+                if (callback && typeof callback === 'function') {
+                    callback.call(this);
+                }
+            };
+            if (support.transitions) {
+                el.addEventListener(transEndEventName, onEndCallbackFn);
+            } else {
+                onEndCallbackFn();
+            }
+        },
+        // the mall element
+        mall = document.querySelector('.mall'),
+        // mall´s levels wrapper
+        mallLevelsEl = mall.querySelector('.levels'),
+        // mall´s levels
+        mallLevels = [].slice.call(mallLevelsEl.querySelectorAll('.level')),
+        // total levels
+        mallLevelsTotal = mallLevels.length,
+        // surroundings elems
+        mallSurroundings = [].slice.call(mall.querySelectorAll('.surroundings')),
+        // selected level position
+        selectedLevel,
+        // navigation element wrapper
+        mallNav = document.querySelector('.mallnav'),
+        // show all mall´s levels ctrl
+        allLevelsCtrl = mallNav.querySelector('.mallnav__button--all-levels'),
+        // levels navigation up/down ctrls
+        levelUpCtrl = mallNav.querySelector('.mallnav__button--up'),
+        levelDownCtrl = mallNav.querySelector('.mallnav__button--down'),
+        // pins
+        pins = [].slice.call(mallLevelsEl.querySelectorAll('.pin')),
+        // content element
+        contentEl = document.querySelector('.content'),
+        // content close ctrl
+        contentCloseCtrl = contentEl.querySelector('button.content__button'),
+        // check if a content item is opened
+        isOpenContentArea,
+        // check if currently animating/navigating
+        isNavigating,
+        // check if all levels are shown or if one level is shown (expanded)
+        isExpanded,
+        // spaces list element
+        spacesListEl = document.getElementById('spaces-list'),
+        // spaces list ul
+        spacesEl = spacesListEl.querySelector('ul.list'),
+        // all the spaces listed
+        spaces = [].slice.call(spacesEl.querySelectorAll('.list__item > a.list__link')),
+        // reference to the current shows space (name set in the data-name attr of both the listed spaces and the pins on the map)
+        spaceref,
+        // sort by ctrls
+        sortByNameCtrl = document.querySelector('#sort-by-name'),
+        // listjs initiliazation (all mall´s spaces)
+        spacesList = new List('spaces-list', {valueNames: ['list__link', {data: ['level']}, {data: ['category']}]}),
 
-	/**
-	 * Initialize/Bind events fn.
-	 */
-	function initEvents() {
-		// click on a Mall´s level
-		mallLevels.forEach(function(level, pos) {
-			level.addEventListener('click', function() {
-				// shows this level
-				showLevel(pos+1);
-			});
-		});
+        // smaller screens:
+        // open search ctrl
+        openSearchCtrl = document.querySelector('button.open-search'),
+        // main container
+        containerEl = document.querySelector('.container'),
+        // close search ctrl
+        closeSearchCtrl = spacesListEl.querySelector('button.close-search');
 
-		// click on the show mall´s levels ctrl
-		allLevelsCtrl.addEventListener('click', function() {
-			// shows all levels
-			showAllLevels();
-		});
+    function init() {
+        // init/bind events
+        initEvents();
+    }
 
-		// navigating through the levels
-		levelUpCtrl.addEventListener('click', function() { navigate('Down'); });
-		levelDownCtrl.addEventListener('click', function() { navigate('Up'); });
+    /**
+     * Initialize/Bind events fn.
+     */
+    function initEvents() {
+        // click on a Mall´s level
+        mallLevels.forEach(function (level, pos) {
+            level.addEventListener('click', function () {
+                // shows this level
+                showLevel(pos + 1);
+            });
+        });
 
-		// sort by name ctrl - add/remove category name (css pseudo element) from list and sorts the spaces by name 
-		sortByNameCtrl.addEventListener('click', function() {
-			if( this.checked ) {
-				classie.remove(spacesEl, 'grouped-by-category');
-				spacesList.sort('list__link');
-			}
-			else {
-				classie.add(spacesEl, 'grouped-by-category'); 
-				spacesList.sort('category');
-			}
-		});
+        // click on the show mall´s levels ctrl
+        allLevelsCtrl.addEventListener('click', function () {
+            // shows all levels
+            showAllLevels();
+        });
 
-		// hovering a pin / clicking a pin
-		pins.forEach(function(pin) {
-			var contentItem = contentEl.querySelector('.content__item[data-space="' + pin.getAttribute('data-space') + '"]');
+        // navigating through the levels
+        levelUpCtrl.addEventListener('click', function () {
+            navigate('Down');
+        });
+        levelDownCtrl.addEventListener('click', function () {
+            navigate('Up');
+        });
 
-			pin.addEventListener('mouseenter', function() {
-				if( !isOpenContentArea ) {
-					classie.add(contentItem, 'content__item--hover');
-				}
-			});
-			pin.addEventListener('mouseleave', function() {
-				if( !isOpenContentArea ) {
-					classie.remove(contentItem, 'content__item--hover');
-				}
-			});
-			pin.addEventListener('click', function(ev) {
-				ev.preventDefault();
-				// open content for this pin
-				openContent(pin.getAttribute('data-space'));
-				// remove hover class (showing the title)
-				classie.remove(contentItem, 'content__item--hover');
-			});
-		});
+        // sort by name ctrl - add/remove category name (css pseudo element) from list and sorts the spaces by name
+        sortByNameCtrl.addEventListener('click', function () {
+            if (this.checked) {
+                classie.remove(spacesEl, 'grouped-by-category');
+                spacesList.sort('list__link');
+            } else {
+                classie.add(spacesEl, 'grouped-by-category');
+                spacesList.sort('category');
+            }
+        });
 
-		// closing the content area
-		contentCloseCtrl.addEventListener('click', function() {
-			closeContentArea();
-		});
+        // hovering a pin / clicking a pin
+        pins.forEach(function (pin) {
+            var contentItem = contentEl.querySelector('.content__item[data-space="' + pin.getAttribute('data-space') + '"]');
 
-		// clicking on a listed space: open level - shows space
-		spaces.forEach(function(space) {
-			var spaceItem = space.parentNode,
-				level = spaceItem.getAttribute('data-level'),
-				spacerefval = spaceItem.getAttribute('data-space');
+            pin.addEventListener('mouseenter', function () {
+                if (!isOpenContentArea) {
+                    classie.add(contentItem, 'content__item--hover');
+                }
+            });
+            pin.addEventListener('mouseleave', function () {
+                if (!isOpenContentArea) {
+                    classie.remove(contentItem, 'content__item--hover');
+                }
+            });
+            pin.addEventListener('click', function (ev) {
+                ev.preventDefault();
+                // open content for this pin
+                openContent(pin.getAttribute('data-space'));
+                // remove hover class (showing the title)
+                classie.remove(contentItem, 'content__item--hover');
+            });
+        });
 
-			space.addEventListener('click', function(ev) {
-				ev.preventDefault();
-				// for smaller screens: close search bar
-				closeSearch();
-				// open level
-				showLevel(level);
-				// open content for this space
-				openContent(spacerefval);
-			});
-		});
+        // closing the content area
+        contentCloseCtrl.addEventListener('click', function () {
+            closeContentArea();
+        });
 
-		// smaller screens: open the search bar
-		openSearchCtrl.addEventListener('click', function() {
-			openSearch();
-		});
+        // clicking on a listed space: open level - shows space
+        spaces.forEach(function (space) {
+            var spaceItem = space.parentNode,
+                level = spaceItem.getAttribute('data-level'),
+                spacerefval = spaceItem.getAttribute('data-space');
 
-		// smaller screens: close the search bar
-		closeSearchCtrl.addEventListener('click', function() {
-			closeSearch();
-		});
-	}
+            space.addEventListener('click', function (ev) {
+                ev.preventDefault();
+                // for smaller screens: close search bar
+                closeSearch();
+                // open level
+                showLevel(level);
+                // open content for this space
+                openContent(spacerefval);
+            });
+        });
 
-	/**
-	 * Opens a level. The current level moves to the center while the other ones move away.
-	 */
-	function showLevel(level) {
-		if( isExpanded ) {
-			return false;
-		}
-		
-		// update selected level val
-		selectedLevel = level;
+        // smaller screens: open the search bar
+        openSearchCtrl.addEventListener('click', function () {
+            openSearch();
+        });
 
-		// control navigation controls state
-		setNavigationState();
+        // smaller screens: close the search bar
+        closeSearchCtrl.addEventListener('click', function () {
+            closeSearch();
+        });
+    }
 
-		classie.add(mallLevelsEl, 'levels--selected-' + selectedLevel);
-		
-		// the level element
-		var levelEl = mallLevels[selectedLevel - 1];
-		classie.add(levelEl, 'level--current');
+    /**
+     * Opens a level. The current level moves to the center while the other ones move away.
+     */
+    function showLevel(level) {
+        if (isExpanded) {
+            return false;
+        }
 
-		onEndTransition(levelEl, function() {
-			classie.add(mallLevelsEl, 'levels--open');
+        // update selected level val
+        selectedLevel = level;
 
-			// show level pins
-			showPins();
+        // control navigation controls state
+        setNavigationState();
 
-			isExpanded = true;
-		}, 'transform');
-		
-		// hide surroundings element
-		hideSurroundings();
-		
-		// show mall nav ctrls
-		showMallNav();
+        classie.add(mallLevelsEl, 'levels--selected-' + selectedLevel);
 
-		// filter the spaces for this level
-		showLevelSpaces();
-	}
+        // the level element
+        var levelEl = mallLevels[selectedLevel - 1];
+        classie.add(levelEl, 'level--current');
 
-	/**
-	 * Shows all Mall´s levels
-	 */
-	function showAllLevels() {
-		if( isNavigating || !isExpanded ) {
-			return false;
-		}
-		isExpanded = false;
+        onEndTransition(levelEl, function () {
+            classie.add(mallLevelsEl, 'levels--open');
 
-		classie.remove(mallLevels[selectedLevel - 1], 'level--current');
-		classie.remove(mallLevelsEl, 'levels--selected-' + selectedLevel);
-		classie.remove(mallLevelsEl, 'levels--open');
+            // show level pins
+            showPins();
 
-		// hide level pins
-		removePins();
+            isExpanded = true;
+        }, 'transform');
 
-		// shows surrounding element
-		showSurroundings();
-		
-		// hide mall nav ctrls
-		hideMallNav();
+        // hide surroundings element
+        hideSurroundings();
 
-		// show back the complete list of spaces
-		spacesList.filter();
+        // show mall nav ctrls
+        showMallNav();
 
-		// close content area if it is open
-		if( isOpenContentArea ) {
-			closeContentArea();
-		}
-	}
+        // filter the spaces for this level
+        showLevelSpaces();
+    }
 
-	/**
-	 * Shows all spaces for current level
-	 */
-	function showLevelSpaces() {
-		spacesList.filter(function(item) { 
-			return item.values().level === selectedLevel.toString(); 
-		});
-	}
+    /**
+     * Shows all Mall´s levels
+     */
+    function showAllLevels() {
+        if (isNavigating || !isExpanded) {
+            return false;
+        }
+        isExpanded = false;
 
-	/**
-	 * Shows the level´s pins
-	 */
-	function showPins(levelEl) {
-		var levelEl = levelEl || mallLevels[selectedLevel - 1];
-		classie.add(levelEl.querySelector('.level__pins'), 'level__pins--active');
-	}
+        classie.remove(mallLevels[selectedLevel - 1], 'level--current');
+        classie.remove(mallLevelsEl, 'levels--selected-' + selectedLevel);
+        classie.remove(mallLevelsEl, 'levels--open');
 
-	/**
-	 * Removes the level´s pins
-	 */
-	function removePins(levelEl) {
-		var levelEl = levelEl || mallLevels[selectedLevel - 1];
-		classie.remove(levelEl.querySelector('.level__pins'), 'level__pins--active');
-	}
+        // hide level pins
+        removePins();
 
-	/**
-	 * Show the navigation ctrls
-	 */
-	function showMallNav() {
-		classie.remove(mallNav, 'mallnav--hidden');
-	}
+        // shows surrounding element
+        showSurroundings();
 
-	/**
-	 * Hide the navigation ctrls
-	 */
-	function hideMallNav() {
-		classie.add(mallNav, 'mallnav--hidden');
-	}
+        // hide mall nav ctrls
+        hideMallNav();
 
-	/**
-	 * Show the surroundings level
-	 */
-	function showSurroundings() {
-		mallSurroundings.forEach(function(el) {
-			classie.remove(el, 'surroundings--hidden');
-		});
-	}
+        // show back the complete list of spaces
+        spacesList.filter();
 
-	/**
-	 * Hide the surroundings level
-	 */
-	function hideSurroundings() {
-		mallSurroundings.forEach(function(el) {
-			classie.add(el, 'surroundings--hidden');
-		});
-	}
+        // close content area if it is open
+        if (isOpenContentArea) {
+            closeContentArea();
+        }
+    }
 
-	/**
-	 * Navigate through the mall´s levels
-	 */
-	function navigate(direction) {
-		if( isNavigating || !isExpanded || isOpenContentArea ) {
-			return false;
-		}
-		isNavigating = true;
+    /**
+     * Shows all spaces for current level
+     */
+    function showLevelSpaces() {
+        spacesList.filter(function (item) {
+            return item.values().level === selectedLevel.toString();
+        });
+    }
 
-		var prevSelectedLevel = selectedLevel;
+    /**
+     * Shows the level´s pins
+     */
+    function showPins(levelEl) {
+        var levelEl = levelEl || mallLevels[selectedLevel - 1];
+        classie.add(levelEl.querySelector('.level__pins'), 'level__pins--active');
+    }
 
-		// current level
-		var currentLevel = mallLevels[prevSelectedLevel-1];
+    /**
+     * Removes the level´s pins
+     */
+    function removePins(levelEl) {
+        var levelEl = levelEl || mallLevels[selectedLevel - 1];
+        classie.remove(levelEl.querySelector('.level__pins'), 'level__pins--active');
+    }
 
-		if( direction === 'Up' && prevSelectedLevel > 1 ) {
-			--selectedLevel;
-		}
-		else if( direction === 'Down' && prevSelectedLevel < mallLevelsTotal ) {
-			++selectedLevel;
-		}
-		else {
-			isNavigating = false;	
-			return false;
-		}
+    /**
+     * Show the navigation ctrls
+     */
+    function showMallNav() {
+        classie.remove(mallNav, 'mallnav--hidden');
+    }
 
-		// control navigation controls state (enabled/disabled)
-		setNavigationState();
-		// transition direction class
-		classie.add(currentLevel, 'level--moveOut' + direction);
-		// next level element
-		var nextLevel = mallLevels[selectedLevel-1]
-		// ..becomes the current one
-		classie.add(nextLevel, 'level--current');
+    /**
+     * Hide the navigation ctrls
+     */
+    function hideMallNav() {
+        classie.add(mallNav, 'mallnav--hidden');
+    }
 
-		// when the transition ends..
-		onEndTransition(currentLevel, function() {
-			classie.remove(currentLevel, 'level--moveOut' + direction);
-			// solves rendering bug for the SVG opacity-fill property
-			setTimeout(function() {classie.remove(currentLevel, 'level--current');}, 60);
+    /**
+     * Show the surroundings level
+     */
+    function showSurroundings() {
+        mallSurroundings.forEach(function (el) {
+            classie.remove(el, 'surroundings--hidden');
+        });
+    }
 
-			classie.remove(mallLevelsEl, 'levels--selected-' + prevSelectedLevel);
-			classie.add(mallLevelsEl, 'levels--selected-' + selectedLevel);
+    /**
+     * Hide the surroundings level
+     */
+    function hideSurroundings() {
+        mallSurroundings.forEach(function (el) {
+            classie.add(el, 'surroundings--hidden');
+        });
+    }
 
-			// show the current level´s pins
-			showPins();
+    /**
+     * Navigate through the mall´s levels
+     */
+    function navigate(direction) {
+        if (isNavigating || !isExpanded || isOpenContentArea) {
+            return false;
+        }
+        isNavigating = true;
 
-			isNavigating = false;
-		});
+        var prevSelectedLevel = selectedLevel;
 
-		// filter the spaces for this level
-		showLevelSpaces();
+        // current level
+        var currentLevel = mallLevels[prevSelectedLevel - 1];
 
-		// hide the previous level´s pins
-		removePins(currentLevel);
-	}
+        if (direction === 'Up' && prevSelectedLevel > 1) {
+            --selectedLevel;
+        } else if (direction === 'Down' && prevSelectedLevel < mallLevelsTotal) {
+            ++selectedLevel;
+        } else {
+            isNavigating = false;
+            return false;
+        }
 
-	/**
-	 * Control navigation ctrls state. Add disable class to the respective ctrl when the current level is either the first or the last.
-	 */
-	function setNavigationState() {
-		if( selectedLevel == 1 ) {
-			classie.add(levelDownCtrl, 'boxbutton--disabled');
-		}
-		else {
-			classie.remove(levelDownCtrl, 'boxbutton--disabled');
-		}
+        // control navigation controls state (enabled/disabled)
+        setNavigationState();
+        // transition direction class
+        classie.add(currentLevel, 'level--moveOut' + direction);
+        // next level element
+        var nextLevel = mallLevels[selectedLevel - 1]
+        // ..becomes the current one
+        classie.add(nextLevel, 'level--current');
 
-		if( selectedLevel == mallLevelsTotal ) {
-			classie.add(levelUpCtrl, 'boxbutton--disabled');
-		}
-		else {
-			classie.remove(levelUpCtrl, 'boxbutton--disabled');
-		}
-	}
+        // when the transition ends..
+        onEndTransition(currentLevel, function () {
+            classie.remove(currentLevel, 'level--moveOut' + direction);
+            // solves rendering bug for the SVG opacity-fill property
+            setTimeout(function () {
+                classie.remove(currentLevel, 'level--current');
+            }, 60);
 
-	/**
-	 * Opens/Reveals a content item.
-	 */
-	function openContent(spacerefval) {
-		// if one already shown:
-		if( isOpenContentArea ) {
-			hideSpace();
-			spaceref = spacerefval;
-			showSpace();
-		}
-		else {
-			spaceref = spacerefval;
-			openContentArea();
-		}
-		
-		// remove class active (if any) from current list item
-		var activeItem = spacesEl.querySelector('li.list__item--active');
-		if( activeItem ) {
-			classie.remove(activeItem, 'list__item--active');
-		}
-		// list item gets class active (if the list item is currently shown in the list)
-		var listItem = spacesEl.querySelector('li[data-space="' + spacerefval + '"]')
-		if( listItem ) {
-			classie.add(listItem, 'list__item--active');
-		}
+            classie.remove(mallLevelsEl, 'levels--selected-' + prevSelectedLevel);
+            classie.add(mallLevelsEl, 'levels--selected-' + selectedLevel);
 
-		// remove class selected (if any) from current space
-		var activeSpaceArea = mallLevels[selectedLevel - 1].querySelector('svg > .map__space--selected');
-		if( activeSpaceArea ) {
-			classie.remove(activeSpaceArea, 'map__space--selected');
-		}
-		// svg area gets selected
-		classie.add(mallLevels[selectedLevel - 1].querySelector('svg > .map__space[data-space="' + spaceref + '"]'), 'map__space--selected');
-	}
+            // show the current level´s pins
+            showPins();
 
-	/**
-	 * Opens the content area.
-	 */
-	function openContentArea() {
-		isOpenContentArea = true;
-		// shows space
-		showSpace(true);
-		// show close ctrl
-		classie.remove(contentCloseCtrl, 'content__button--hidden');
-		// resize mall area
-		classie.add(mall, 'mall--content-open');
-		// disable mall nav ctrls
-		classie.add(levelDownCtrl, 'boxbutton--disabled');
-		classie.add(levelUpCtrl, 'boxbutton--disabled');
-	}
+            isNavigating = false;
+        });
 
-	/**
-	 * Shows a space.
-	 */
-	function showSpace(sliding) {
-		// the content item
-		var contentItem = contentEl.querySelector('.content__item[data-space="' + spaceref + '"]');
-		// show content
-		classie.add(contentItem, 'content__item--current');
-		if( sliding ) {
-			onEndTransition(contentItem, function() {
-				classie.add(contentEl, 'content--open');
-			});
-		}
-		// map pin gets selected
-		classie.add(mallLevelsEl.querySelector('.pin[data-space="' + spaceref + '"]'), 'pin--active');
-	}
+        // filter the spaces for this level
+        showLevelSpaces();
 
-	/**
-	 * Closes the content area.
-	 */
-	function closeContentArea() {
-		classie.remove(contentEl, 'content--open');
-		// close current space
-		hideSpace();
-		// hide close ctrl
-		classie.add(contentCloseCtrl, 'content__button--hidden');
-		// resize mall area
-		classie.remove(mall, 'mall--content-open');
-		// enable mall nav ctrls
-		if( isExpanded ) {
-			setNavigationState();
-		}
-		isOpenContentArea = false;
-	}
+        // hide the previous level´s pins
+        removePins(currentLevel);
+    }
 
-	/**
-	 * Hides a space.
-	 */
-	function hideSpace() {
-		// the content item
-		var contentItem = contentEl.querySelector('.content__item[data-space="' + spaceref + '"]');
-		// hide content
-		classie.remove(contentItem, 'content__item--current');
-		// map pin gets unselected
-		classie.remove(mallLevelsEl.querySelector('.pin[data-space="' + spaceref + '"]'), 'pin--active');
-		// remove class active (if any) from current list item
-		var activeItem = spacesEl.querySelector('li.list__item--active');
-		if( activeItem ) {
-			classie.remove(activeItem, 'list__item--active');
-		}
-		// remove class selected (if any) from current space
-		var activeSpaceArea = mallLevels[selectedLevel - 1].querySelector('svg > .map__space--selected');
-		if( activeSpaceArea ) {
-			classie.remove(activeSpaceArea, 'map__space--selected');
-		}
-	}
+    /**
+     * Control navigation ctrls state. Add disable class to the respective ctrl when the current level is either the first or the last.
+     */
+    function setNavigationState() {
+        if (selectedLevel == 1) {
+            classie.add(levelDownCtrl, 'boxbutton--disabled');
+        } else {
+            classie.remove(levelDownCtrl, 'boxbutton--disabled');
+        }
 
-	/**
-	 * for smaller screens: open search bar
-	 */
-	function openSearch() {
-		// shows all levels - we want to show all the spaces for smaller screens 
-		showAllLevels();
+        if (selectedLevel == mallLevelsTotal) {
+            classie.add(levelUpCtrl, 'boxbutton--disabled');
+        } else {
+            classie.remove(levelUpCtrl, 'boxbutton--disabled');
+        }
+    }
 
-		classie.add(spacesListEl, 'spaces-list--open');
-		classie.add(containerEl, 'container--overflow');
-	}
+    /**
+     * Opens/Reveals a content item.
+     */
+    function openContent(spacerefval) {
+        // if one already shown:
+        if (isOpenContentArea) {
+            hideSpace();
+            spaceref = spacerefval;
+            showSpace();
+        } else {
+            spaceref = spacerefval;
+            openContentArea();
+        }
 
-	/**
-	 * for smaller screens: close search bar
-	 */
-	function closeSearch() {
-		classie.remove(spacesListEl, 'spaces-list--open');
-		classie.remove(containerEl, 'container--overflow');
-	}
-	
-	init();
+        // remove class active (if any) from current list item
+        var activeItem = spacesEl.querySelector('li.list__item--active');
+        if (activeItem) {
+            classie.remove(activeItem, 'list__item--active');
+        }
+        // list item gets class active (if the list item is currently shown in the list)
+        var listItem = spacesEl.querySelector('li[data-space="' + spacerefval + '"]')
+        if (listItem) {
+            classie.add(listItem, 'list__item--active');
+        }
+
+        // remove class selected (if any) from current space
+        var activeSpaceArea = mallLevels[selectedLevel - 1].querySelector('svg > .map__space--selected');
+        if (activeSpaceArea) {
+            classie.remove(activeSpaceArea, 'map__space--selected');
+        }
+        // svg area gets selected
+        classie.add(mallLevels[selectedLevel - 1].querySelector('svg > .map__space[data-space="' + spaceref + '"]'), 'map__space--selected');
+    }
+
+    /**
+     * Opens the content area.
+     */
+    function openContentArea() {
+        isOpenContentArea = true;
+        // shows space
+        showSpace(true);
+        // show close ctrl
+        classie.remove(contentCloseCtrl, 'content__button--hidden');
+        // resize mall area
+        classie.add(mall, 'mall--content-open');
+        // disable mall nav ctrls
+        classie.add(levelDownCtrl, 'boxbutton--disabled');
+        classie.add(levelUpCtrl, 'boxbutton--disabled');
+    }
+
+    /**
+     * Shows a space.
+     */
+    function showSpace(sliding) {
+        // the content item
+        var contentItem = contentEl.querySelector('.content__item[data-space="' + spaceref + '"]');
+        // show content
+        classie.add(contentItem, 'content__item--current');
+        if (sliding) {
+            onEndTransition(contentItem, function () {
+                classie.add(contentEl, 'content--open');
+            });
+        }
+        // map pin gets selected
+        classie.add(mallLevelsEl.querySelector('.pin[data-space="' + spaceref + '"]'), 'pin--active');
+    }
+
+    /**
+     * Closes the content area.
+     */
+    function closeContentArea() {
+        classie.remove(contentEl, 'content--open');
+        // close current space
+        hideSpace();
+        // hide close ctrl
+        classie.add(contentCloseCtrl, 'content__button--hidden');
+        // resize mall area
+        classie.remove(mall, 'mall--content-open');
+        // enable mall nav ctrls
+        if (isExpanded) {
+            setNavigationState();
+        }
+        isOpenContentArea = false;
+    }
+
+    /**
+     * Hides a space.
+     */
+    function hideSpace() {
+        // the content item
+        var contentItem = contentEl.querySelector('.content__item[data-space="' + spaceref + '"]');
+        // hide content
+        classie.remove(contentItem, 'content__item--current');
+        // map pin gets unselected
+        classie.remove(mallLevelsEl.querySelector('.pin[data-space="' + spaceref + '"]'), 'pin--active');
+        // remove class active (if any) from current list item
+        var activeItem = spacesEl.querySelector('li.list__item--active');
+        if (activeItem) {
+            classie.remove(activeItem, 'list__item--active');
+        }
+        // remove class selected (if any) from current space
+        var activeSpaceArea = mallLevels[selectedLevel - 1].querySelector('svg > .map__space--selected');
+        if (activeSpaceArea) {
+            classie.remove(activeSpaceArea, 'map__space--selected');
+        }
+    }
+
+    /**
+     * for smaller screens: open search bar
+     */
+    function openSearch() {
+        // shows all levels - we want to show all the spaces for smaller screens
+        showAllLevels();
+
+        classie.add(spacesListEl, 'spaces-list--open');
+        classie.add(containerEl, 'container--overflow');
+    }
+
+    /**
+     * for smaller screens: close search bar
+     */
+    function closeSearch() {
+        classie.remove(spacesListEl, 'spaces-list--open');
+        classie.remove(containerEl, 'container--overflow');
+    }
+
+    init();
 
 })(window);
+
+
+$(document).ready(function () {
+
+    var scale = 0.8;
+
+    $(window).on('wheel', function (event) {
+
+        let maxScale = 2.0;
+        let minScale = 0.5;
+
+        let deltaY = 0;
+        if (event.originalEvent.deltaY) {
+            deltaY = event.originalEvent.deltaY;
+        } else if (event.originalEvent.wheelDelta) {
+            deltaY = -event.originalEvent.wheelDelta;
+        }
+
+        scale += (deltaY > 0) ? 0.1 : -0.1;
+
+        if (scale > maxScale) {
+            scale = maxScale;
+        }
+
+        if (scale < minScale) {
+            scale = minScale;
+        }
+
+        $(".mall.zoom").css({
+            transform: 'scale(' + scale + ')',
+        });
+    });
+
+});

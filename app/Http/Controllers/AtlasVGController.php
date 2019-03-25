@@ -43,6 +43,10 @@ class AtlasVGController extends Controller
 
                 return $carry;
             }, []);
+
+            $environment['surroundings'] = array_map(function ($param) use ($building) {
+                return $param * $building->proportion;
+            }, $environment['level']);
         }
 
         return view('main', [

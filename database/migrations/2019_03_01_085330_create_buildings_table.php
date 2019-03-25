@@ -19,6 +19,8 @@ class CreateBuildingsTable extends Migration
             $table->string('name');
             $table->text('description');
             $table->text('svg');
+            $table->float('proportion')
+                ->default(1.0);
             $table->timestamps();
         });
     }

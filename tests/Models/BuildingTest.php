@@ -11,12 +11,12 @@ class BuildingTest extends TestCase
 
     public function testRelations()
     {
-        Building::all()->each(function (Building $building) {
-            $this->assertIsArray($building->toArray());
-            $this->assertCount(6, $building->toArray());
+        $building = Building::find(1);
 
-            $this->assertInstanceOf(Collection::class, $building->levels);
-            $this->assertCount(3, $building->levels);
-        });
+        $this->assertIsArray($building->toArray());
+        $this->assertCount(5, $building->toArray());
+
+        $this->assertInstanceOf(Collection::class, $building->levels);
+        $this->assertCount(3, $building->levels);
     }
 }

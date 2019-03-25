@@ -17,6 +17,7 @@ class BuildingsTableSeeder extends Seeder
             'name' => 'Sample Mall',
             'description' => 'Some fake mall.',
             'svg' => $surrounding,
+            'proportion' => 2.0,
         ]);
         $building->save();
     }

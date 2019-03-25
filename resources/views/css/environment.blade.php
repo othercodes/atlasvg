@@ -1,9 +1,9 @@
 <style>
     @if (isset($environment))
     .surroundings {
-        width: {{ $environment['level']['width']*1.8 }}vmin;
-        height: {{ $environment['level']['height']*1.8 }}vmin;
-        margin: -{{ $environment['level']['top']*1.8 }}vmin 0 0 -{{ $environment['level']['left']*1.8 }}vmin;
+        width: {{ $environment['surroundings']['width'] }}vmin;
+        height: {{ $environment['surroundings']['height'] }}vmin;
+        margin: -{{ $environment['surroundings']['top'] }}vmin 0 0 -{{ $environment['surroundings']['left'] }}vmin;
     }
 
     .levels {

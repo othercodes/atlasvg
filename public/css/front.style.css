@@ -47,7 +47,7 @@ button:focus {
     outline: none;
 }
 
-.no-buildings  {
+.no-buildings {
     padding-top: 20px;
 }
 
@@ -84,6 +84,7 @@ button:focus {
 }
 
 .mall {
+    transform: scale(0.8);
     position: relative;
     width: 100%;
     height: 100%;
@@ -307,6 +308,35 @@ button:focus {
     transition: fill-opacity 0.8s;
     fill: #bdbdbd;
     fill-opacity: 0.6;
+}
+
+.map__space.fake {
+    fill: none;
+}
+
+.map__none {
+    fill: #fff;
+    fill-opacity: 0.0;
+}
+
+.map__door {
+    fill: #c2c7ca;
+}
+
+.map__icon {
+    fill: #47485a;
+}
+
+.map__wall {
+    fill: #8a8f96;
+}
+
+.map__desk {
+    fill: #2f76bc;
+}
+
+.map__person {
+    fill: #1894fc;
 }
 
 .level--current .map__space {
