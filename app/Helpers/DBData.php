@@ -132,7 +132,7 @@ class DBData
             /** @var Builder $class */
             $query = $class::select();
             foreach ($data as $field => $value) {
-                if (is_scalar($value) && !in_array($field, ['svg', 'surroundings', 'space', 'room'])) {
+                if (is_scalar($value) && !in_array($field, ['svg', 'map', 'space', 'room'])) {
                     $query->where($field, '=', $value);
                 }
             }
