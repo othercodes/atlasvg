@@ -277,7 +277,6 @@ class Level extends Model
 
                         }
                         break;
-
                     case 'circle':
                         if ($this->validate($node, ['cx', 'cy', 'r'])) {
                             $this->buildSpaceModel([
@@ -291,7 +290,7 @@ class Level extends Model
                         }
                         break;
                     default:
-                        continue;
+                        continue 2;
                 }
             }
 

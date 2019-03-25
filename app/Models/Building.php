@@ -34,6 +34,7 @@ class Building extends Model
         'location',
         'svg',
         'map',
+        'proportion'
     ];
 
     /**
@@ -46,6 +47,7 @@ class Building extends Model
         'description',
         'location',
         'map',
+        'proportion',
         'levels',
     ];
 
