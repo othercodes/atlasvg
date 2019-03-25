@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $tokenExpires
  * @property string $userName
  * @property string $userEmail
+ * @property int $building_id
  * @package AtlasVG\Models
  */
 class AuthData extends Model {
@@ -30,5 +31,15 @@ class AuthData extends Model {
         'tokenExpires',
         'userName',
         'userEmail',
+        'building_id'
     ];
+
+    /**
+     * Get building that belongs to this authentication scope
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function building()
+    {
+        return $this->hasOne('AtlasVG\Models\Building');
+    }
 }

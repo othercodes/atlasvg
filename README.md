@@ -54,5 +54,4 @@ php artisan migrate:refresh --seed
 To configure integration with Azure:
 * create an application in https://apps.dev.microsoft.com/ specifying redirect url as "http://localhost:8000/app/callback"
 * use .env.example for project configuration as example, putting OAUTH_APP_ID and OAUTH_APP_PASSWORD for the application you have created
-* specify OFFICE_LOCATION for scope limiting
 * after installation navigate to /signin to authenticate in Azure

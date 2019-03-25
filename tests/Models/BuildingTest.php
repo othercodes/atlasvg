@@ -13,7 +13,7 @@ class BuildingTest extends TestCase
     {
         Building::all()->each(function (Building $building) {
             $this->assertIsArray($building->toArray());
-            $this->assertCount(5, $building->toArray());
+            $this->assertCount(6, $building->toArray());
 
             $this->assertInstanceOf(Collection::class, $building->levels);
             $this->assertCount(3, $building->levels);

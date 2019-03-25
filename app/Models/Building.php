@@ -11,6 +11,7 @@ use SimpleXMLIterator;
  * @property int $id
  * @property string $name
  * @property string $description
+ * @property string $location
  * @property \SimpleXMLElement|string $svg
  * @property Collection|Level[] $levels
  * @package AtlasVG\Models
@@ -30,6 +31,7 @@ class Building extends Model
     protected $fillable = [
         'name',
         'description',
+        'location',
         'svg',
         'map',
     ];
@@ -42,6 +44,7 @@ class Building extends Model
         'id',
         'name',
         'description',
+        'location',
         'map',
         'levels',
     ];
@@ -61,6 +64,15 @@ class Building extends Model
     protected $with = [
         'levels'
     ];
+
+    /**
+     * Get authentication data for Sync
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function authdata()
+    {
+        return $this->hasOne('AtlasVG\Models\AuthData');
+    }
 
     /**
      * Get the levels for the building
