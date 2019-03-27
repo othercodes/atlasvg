@@ -6,6 +6,10 @@ use AtlasVG\Models\Building;
 use Illuminate\Database\Eloquent\Collection;
 use Test\TestCase;
 
+/**
+ * Class BuildingTest
+ * @package Test\Models
+ */
 class BuildingTest extends TestCase
 {
 

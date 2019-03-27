@@ -62,8 +62,13 @@ class ShowItems extends \Illuminate\Console\Command
                 $this->error('Unable to load the required data model.');
             }
 
+            return 0;
+
         } catch (\Exception $e) {
+
             $this->error($e->getMessage());
+
+            return 1;
         }
     }
 }

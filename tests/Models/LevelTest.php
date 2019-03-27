@@ -7,6 +7,10 @@ use AtlasVG\Models\Level;
 use Illuminate\Database\Eloquent\Collection;
 use Test\TestCase;
 
+/**
+ * Class LevelTest
+ * @package Test\Models
+ */
 class LevelTest extends TestCase
 {
 
