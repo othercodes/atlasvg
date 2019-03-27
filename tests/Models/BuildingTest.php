@@ -14,7 +14,7 @@ class BuildingTest extends TestCase
         $building = Building::find(1);
 
         $this->assertIsArray($building->toArray());
-        $this->assertCount(5, $building->toArray());
+        $this->assertCount(7, $building->toArray());
 
         $this->assertInstanceOf(Collection::class, $building->levels);
         $this->assertCount(3, $building->levels);
