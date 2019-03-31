@@ -97,13 +97,11 @@ class Space extends Model
             case'svg':
             case'rect':
                 return round($this->width * $this->height, 2);
-                break;
             case'circle':
                 return round(3.14159 * pow($this->radius, 2), 2);
-                break;
+            default:
+                return 0.0;
         }
-
-        return 0.0;
     }
 
     /**
@@ -119,17 +117,18 @@ class Space extends Model
                     'x' => (float)($this->x + ($this->width / 2)),
                     'y' => (float)($this->y + ($this->height / 2)),
                 ];
-
-                break;
             case 'circle':
                 return [
                     'x' => (float)$this->x,
                     'y' => (float)$this->y,
                 ];
-
-                break;
+            case 'ellipse':
+                return [
+                    'x' => (float)$this->x,
+                    'y' => (float)$this->y,
+                ];
+            default:
+                return [];
         }
-
-        return [];
     }
 }

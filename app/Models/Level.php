@@ -121,6 +121,7 @@ class Level extends Model
     }
 
     /**
+     * Get the SVG attribute
      * @param string $svg
      * @return SimpleXMLIterator
      */
@@ -159,6 +160,7 @@ class Level extends Model
     }
 
     /**
+     * Set the space attribute
      * @param string $spaceAttribute
      */
     public function setSpaceAttribute(string $spaceAttribute)
@@ -167,6 +169,7 @@ class Level extends Model
     }
 
     /**
+     * return the the configured space attribute
      * @return string
      */
     public function getSpaceAttribute(): string
@@ -239,6 +242,13 @@ class Level extends Model
      */
     public function discover(): Collection
     {
+
+        /**
+         * create a default space for the complete level using
+         * the viewBox parameters, if a pointer cannot be placed
+         * in a certain space it will be assigned to this default
+         * space level.
+         */
         $viewBox = explode(' ', $this->svg['viewBox']);
         $this->buildSpaceModel([
             'type' => 'svg',
@@ -249,8 +259,16 @@ class Level extends Model
             'height' => (float)$viewBox[3],
         ]);
 
+        /**
+         * parse the parent node (svg) searching for valid
+         * space tags/entities (with the $spaceAttribute).
+         */
         $this->parse($this->svg);
 
+        /**
+         * Load the newly discovered spaces and return it
+         * as result of the discover operation.
+         */
         return $this->spaces()->get();
     }
 
@@ -265,7 +283,7 @@ class Level extends Model
             if (isset($node[$this->spaceAttribute])) {
                 switch ($node->getName()) {
                     case 'rect':
-                        if ($this->validate($node, ['x', 'y', 'width', 'height'])) {
+                        if ($this->hasRequiredAttributes($node, ['x', 'y', 'width', 'height'])) {
                             $this->buildSpaceModel([
                                 'type' => $node->getName(),
                                 'data' => (float)$node[$this->spaceAttribute],
@@ -274,23 +292,35 @@ class Level extends Model
                                 'width' => (float)$node['width'],
                                 'height' => (float)$node['height'],
                             ]);
-
                         }
+
                         break;
                     case 'circle':
-                        if ($this->validate($node, ['cx', 'cy', 'r'])) {
+                        if ($this->hasRequiredAttributes($node, ['cx', 'cy', 'r'])) {
                             $this->buildSpaceModel([
                                 'type' => $node->getName(),
                                 'data' => (float)$node[$this->spaceAttribute],
                                 'x' => (float)$node['cx'],
                                 'y' => (float)$node['cy'],
-                                'radius' => (float)$node['r']
+                                'rx' => (float)$node['r'],
+                                'ry' => (float)$node['r']
                             ]);
-
                         }
+
                         break;
-                    default:
-                        continue 2;
+                    case 'ellipse':
+                        if ($this->hasRequiredAttributes($node, ['cx', 'cy', 'rx', 'ry'])) {
+                            $this->buildSpaceModel([
+                                'type' => $node->getName(),
+                                'data' => (float)$node[$this->spaceAttribute],
+                                'x' => (float)$node['cx'],
+                                'y' => (float)$node['cy'],
+                                'rx' => (float)$node['rx'],
+                                'ry' => (float)$node['ry']
+                            ]);
+                        }
+
+                        break;
                 }
             }
 
@@ -335,7 +365,7 @@ class Level extends Model
      * @param array $requiredAttributes
      * @return bool
      */
-    private function validate(\SimpleXMLElement $node, array $requiredAttributes): bool
+    private function hasRequiredAttributes(\SimpleXMLElement $node, array $requiredAttributes): bool
     {
         $missing = array_filter($requiredAttributes, function ($attribute) use ($node) {
             return !isset($node[$attribute]);
@@ -345,6 +375,7 @@ class Level extends Model
     }
 
     /**
+     * Calculate the relative center of the give space
      * @param Space $space
      * @return array
      */

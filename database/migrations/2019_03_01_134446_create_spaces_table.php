@@ -21,7 +21,8 @@ class CreateSpacesTable extends Migration
             $table->float('y')->default(0.0);
             $table->float('width')->default(0.0);
             $table->float('height')->default(0.0);
-            $table->float('radius')->default(0.0);
+            $table->float('rx')->default(0.0);
+            $table->float('ry')->default(0.0);
             $table->unsignedInteger('level_id');
             $table->foreign('level_id')
                 ->references('id')

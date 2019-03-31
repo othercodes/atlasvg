@@ -84,6 +84,7 @@ class DBData
                                 : $levelDBModel->spaces()->first();
 
                             if (!$spaceDBModel) {
+                                Log::info("Unable to find valid space ({$pointer['room']}) for pointer index: {$pointerIndex}");
                                 continue;
                             }
 

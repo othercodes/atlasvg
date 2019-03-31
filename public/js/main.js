@@ -96,8 +96,6 @@
         sortByNameCtrl = document.querySelector('#sort-by-name'),
         // listjs initiliazation (all mall´s spaces)
         spacesList = new List('spaces-list', {valueNames: ['list__link', {data: ['level']}, {data: ['category']}]}),
-
-        // smaller screens:
         // open search ctrl
         openSearchCtrl = document.querySelector('button.open-search'),
         // main container
@@ -422,6 +420,7 @@
         if (activeItem) {
             classie.remove(activeItem, 'list__item--active');
         }
+
         // list item gets class active (if the list item is currently shown in the list)
         var listItem = spacesEl.querySelector('li[data-space="' + spacerefval + '"]')
         if (listItem) {
@@ -429,12 +428,17 @@
         }
 
         // remove class selected (if any) from current space
-        var activeSpaceArea = mallLevels[selectedLevel - 1].querySelector('svg > .map__space--selected');
+        let activeSpaceArea = mallLevels[selectedLevel - 1].querySelector('svg > .map__space--selected');
         if (activeSpaceArea) {
             classie.remove(activeSpaceArea, 'map__space--selected');
         }
+
         // svg area gets selected
-        classie.add(mallLevels[selectedLevel - 1].querySelector('svg > .map__space[data-space="' + spaceref + '"]'), 'map__space--selected');
+        let level = mallLevels[selectedLevel - 1].querySelector('svg .map__space[data-space="' + spaceref + '"]');
+        if (level) {
+            classie.add(level, 'map__space--selected');
+        }
+
     }
 
     /**
@@ -533,11 +537,9 @@
 
 })(window);
 
-
 $(document).ready(function () {
 
     var scale = 0.8;
-
     $(window).on('wheel', function (event) {
 
         let maxScale = 2.0;
@@ -550,7 +552,7 @@ $(document).ready(function () {
             deltaY = -event.originalEvent.wheelDelta;
         }
 
-        scale += (deltaY > 0) ? 0.1 : -0.1;
+        scale += (deltaY > 0) ? -0.1 : 0.1;
 
         if (scale > maxScale) {
             scale = maxScale;
@@ -560,9 +562,15 @@ $(document).ready(function () {
             scale = minScale;
         }
 
-        $(".mall.zoom").css({
-            transform: 'scale(' + scale + ')',
-        });
+        let map = $(".mall.zoom");
+        let css = 'scale3d(' + scale + ', ' + scale + ', 1)';
+
+        if (map.attr('class').includes('mall--content-open')) {
+            css = css.concat('translate3d(0, -25%, 0)');
+        }
+
+        map.css({transform: css});
+
     });
 
 });
