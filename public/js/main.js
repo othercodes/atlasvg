@@ -566,7 +566,7 @@ $(document).ready(function () {
         let css = 'scale3d(' + scale + ', ' + scale + ', 1)';
 
         if (map.attr('class').includes('mall--content-open')) {
-            css = css.concat('translate3d(0, -25%, 0)');
+            css = css.concat('translate3d(0, -15%, 0)');
         }
 
         map.css({transform: css});
