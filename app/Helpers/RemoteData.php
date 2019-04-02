@@ -74,7 +74,7 @@ class RemoteData
 
                     if ($match) {
 
-                        Log::info("Found a user: {$match['userPrincipalName']}.");
+                        Log::debug("Found a user: {$match['userPrincipalName']}.");
 
                         $pointer->name = "{$match['givenName']} {$match['surname']}";
                         $pointer->description = "Job Title: {$match['jobTitle']} <br> Department: {$match['department']}";
@@ -84,8 +84,34 @@ class RemoteData
 
                     } else {
 
-                        Log::error("Couldn't find user with email: {$pointer->meta}.");
-                        $result['failed']++;
+                        Log::debug("Couldn't find user with email: {$pointer->meta}, retrieving info manually");
+
+                        $getUserByEmailUrl = '/users/' . $pointer->meta;
+
+                        try {
+
+                            $response = $graph->createRequest('GET', $getUserByEmailUrl)
+                                ->addHeaders(array("Content-Type" => "application/json"))
+                                ->execute();
+
+                            $user = $response->getBody();
+
+                            $pointer->name = "{$user['givenName']} {$user['surname']}";
+                            $pointer->save();
+
+                            $result['successful']++;
+
+                        } catch (\GuzzleHttp\Exception\ClientException $exception) {
+
+                            if ($exception->getResponse()->getStatusCode() == "404") {
+                                Log::warning("User with email address {$pointer->meta} doesn't exist.");
+                                $result['failed']++;
+                            } else {
+                                throw $exception;
+                            }
+
+                        }
+                        
 
                     }
 

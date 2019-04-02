@@ -43,11 +43,13 @@ class Token {
 
         if ($authdata->tokenExpires <= $now) {
 
+            Log::debug("Token has expired, retrieving a new one...");
+
             # expired, let's refresh
             $oauthClient = new \League\OAuth2\Client\Provider\GenericProvider([
                 'clientId' => env('OAUTH_APP_ID'),
                 'clientSecret' => env('OAUTH_APP_PASSWORD'),
-                'redirectUri' => env('OAUTH_REDIRECT_URI'),
+                'redirectUri' => env('OAUTH_REDIRECT_URI'). $authdata->building_id,
                 'urlAuthorize' => env('OAUTH_AUTHORITY') . env('OAUTH_AUTHORIZE_ENDPOINT'),
                 'urlAccessToken' => env('OAUTH_AUTHORITY') . env('OAUTH_TOKEN_ENDPOINT'),
                 'urlResourceOwnerDetails' => '',
@@ -59,6 +61,8 @@ class Token {
                 $newToken = $oauthClient->getAccessToken('refresh_token', [
                     'refresh_token' => $authdata->refreshToken,
                 ]);
+
+                Log::debug("Successfully aquired a new token, storing in db...");
 
                 # storing new tokens for the same building
                 $this->updateTokens($newToken, $authdata);
