@@ -6,27 +6,15 @@ use AtlasVG\Http\Controllers\Controller;
 use AtlasVG\Models\Building;
 use AtlasVG\Helpers\Token;
 use Illuminate\Http\Request;
-use Microsoft\Graph\Graph;
-use Microsoft\Graph\Model;
-use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller {
 
     public function signin($bid = null) {
 
         $bid = $this->validate_bid($bid);
+        $token = new Token($bid);
 
-        $oauthClient = new \League\OAuth2\Client\Provider\GenericProvider([
-            'clientId' => env('OAUTH_APP_ID'),
-            'clientSecret' => env('OAUTH_APP_PASSWORD'),
-            'redirectUri' => env('OAUTH_REDIRECT_URI') . $bid,
-            'urlAuthorize' => env('OAUTH_AUTHORITY') . env('OAUTH_AUTHORIZE_ENDPOINT'),
-            'urlAccessToken' => env('OAUTH_AUTHORITY') . env('OAUTH_TOKEN_ENDPOINT'),
-            'urlResourceOwnerDetails' => '',
-            'scopes' => env('OAUTH_SCOPES'),
-        ]);
-
-        $authUrl = $oauthClient->getAuthorizationUrl();
+        $authUrl = $token->getRedirectUrl();
 
         # redirect to AAD passing this app's client id and secret,
         # o365 will call callback() in case of successful auth
@@ -37,52 +25,14 @@ class AuthController extends Controller {
     public function callback(Request $request, $bid = null) {
 
         $bid = $this->validate_bid($bid);
-
         // authorization code should be in the "code" query param
         $authCode = $request->query('code');
 
-        if (isset($authCode)) {
+        $token = new Token($bid);
+        $token->generateTokens($authCode);
 
-            $oauthClient = new \League\OAuth2\Client\Provider\GenericProvider([
-                'clientId' => env('OAUTH_APP_ID'),
-                'clientSecret' => env('OAUTH_APP_PASSWORD'),
-                'redirectUri' => env('OAUTH_REDIRECT_URI') . $bid,
-                'urlAuthorize' => env('OAUTH_AUTHORITY') . env('OAUTH_AUTHORIZE_ENDPOINT'),
-                'urlAccessToken' => env('OAUTH_AUTHORITY') . env('OAUTH_TOKEN_ENDPOINT'),
-                'urlResourceOwnerDetails' => '',
-                'scopes' => env('OAUTH_SCOPES'),
-            ]);
+        return redirect('/app/sync/' .$bid);
 
-            try {
-
-                // Make the token request
-                $accessToken = $oauthClient->getAccessToken('authorization_code', [
-                    'code' => $authCode,
-                ]);
-
-                $graph = new Graph();
-                $graph->setAccessToken($accessToken->getToken());
-
-                # getting token's holder info for audit purposes to know who synced user data
-                $user = $graph->createRequest('GET', '/me')
-                    ->setReturnType(Model\User::class)
-                    ->execute();
-
-                $token = new Token();
-                $token->storeTokens($accessToken, $user, $bid);
-
-                # once auth is done and token successfully saved in db, we can repeatedly sync through /sync
-                return redirect('/app/sync/' .$bid);
-
-            } catch (League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
-                # TODO: error handling if something is wrong with the token
-                # for now silently redirecting to /
-                return redirect('/');
-            }
-        }
-
-        # silently redirect to homepage if someone goes to callback page by mistake, by design :)
-        return redirect('/');
     }
 
     private function validate_bid($bid = null) {

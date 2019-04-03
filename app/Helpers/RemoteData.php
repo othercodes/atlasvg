@@ -31,12 +31,6 @@ class RemoteData
             throw new \Exception("Location is for building #{$bid} is not defined, cannot perform sync.");
         }
 
-        $token = new Token();
-        $accessToken = $token->getAccessToken($bid);
-
-        $graph = new Graph();
-        $graph->setAccessToken($accessToken);
-
         $queryParams = array(
             '$select' => 'givenName,surname,jobTitle,department,userPrincipalName',
             '$filter' => "officeLocation eq '$building->location'",
@@ -45,11 +39,9 @@ class RemoteData
 
         $getUsersUrl = '/me/people?' . http_build_query($queryParams);
 
-        $response = $graph->createRequest('GET', $getUsersUrl)
-            ->addHeaders(array("Content-Type" => "application/json"))
-            ->execute();
-
-        $users = collect($response->getBody()['value']);
+        $token = new Token($bid);
+        $response = $token->sendRequest($getUsersUrl);
+        $users = collect($response['value']);
 
         $result = array(
             "successful" => 0,
@@ -90,11 +82,7 @@ class RemoteData
 
                         try {
 
-                            $response = $graph->createRequest('GET', $getUserByEmailUrl)
-                                ->addHeaders(array("Content-Type" => "application/json"))
-                                ->execute();
-
-                            $user = $response->getBody();
+                            $user = $token->sendRequest($getUserByEmailUrl);
 
                             $pointer->name = "{$user['givenName']} {$user['surname']}";
                             $pointer->save();
