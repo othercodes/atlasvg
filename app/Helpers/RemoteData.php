@@ -2,12 +2,9 @@
 
 namespace AtlasVG\Helpers;
 
-use AtlasVG\Models\Pointer;
 use AtlasVG\Models\Building;
-use AtlasVG\Models\Level;
-use AtlasVG\Helpers\Token;
+use AtlasVG\Helpers\GraphAPI;
 use Illuminate\Support\Facades\Log;
-use Microsoft\Graph\Graph;
 
 class RemoteData
 {
@@ -39,8 +36,8 @@ class RemoteData
 
         $getUsersUrl = '/me/people?' . http_build_query($queryParams);
 
-        $token = new Token($bid);
-        $response = $token->sendRequest($getUsersUrl);
+        $api = new GraphAPI($bid);
+        $response = $api->sendRequest($getUsersUrl);
         $users = collect($response['value']);
 
         $result = array(
@@ -78,12 +75,12 @@ class RemoteData
 
                         Log::debug("Couldn't find user with email: {$pointer->meta}, retrieving info manually");
 
-                        $getUserByEmailUrl = '/users/' . $pointer->meta;
-
                         try {
 
-                            $user = $token->sendRequest($getUserByEmailUrl);
+                            $getUserByEmailUrl = '/users/' . $pointer->meta;
+                            $user = $api->sendRequest($getUserByEmailUrl);
 
+                            # without admin context that API endpoint returns only given name and surname 
                             $pointer->name = "{$user['givenName']} {$user['surname']}";
                             $pointer->save();
 
@@ -97,10 +94,8 @@ class RemoteData
                             } else {
                                 throw $exception;
                             }
-
                         }
                         
-
                     }
 
                 }

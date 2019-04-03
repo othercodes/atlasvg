@@ -4,7 +4,7 @@ namespace AtlasVG\Http\Controllers;
 
 use AtlasVG\Http\Controllers\Controller;
 use AtlasVG\Models\Building;
-use AtlasVG\Helpers\Token;
+use AtlasVG\Helpers\GraphAPI;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller {
@@ -12,9 +12,9 @@ class AuthController extends Controller {
     public function signin($bid = null) {
 
         $bid = $this->validate_bid($bid);
-        $token = new Token($bid);
+        $api = new GraphAPI($bid);
 
-        $authUrl = $token->getRedirectUrl();
+        $authUrl = $api->getRedirectUrl();
 
         # redirect to AAD passing this app's client id and secret,
         # o365 will call callback() in case of successful auth
@@ -28,8 +28,8 @@ class AuthController extends Controller {
         // authorization code should be in the "code" query param
         $authCode = $request->query('code');
 
-        $token = new Token($bid);
-        $token->generateTokens($authCode);
+        $api = new GraphAPI($bid);
+        $api->generateTokens($authCode);
 
         return redirect('/app/sync/' .$bid);
 

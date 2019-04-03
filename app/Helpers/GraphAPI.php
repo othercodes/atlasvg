@@ -6,9 +6,8 @@ use AtlasVG\Models\AuthData;
 use Illuminate\Support\Facades\Log;
 use League\OAuth2\Client\Provider\GenericProvider;
 use Microsoft\Graph\Graph;
-//use Microsoft\Graph\Model;
 
-class Token {
+class GraphAPI {
 
     protected $authdata;
 
@@ -17,10 +16,12 @@ class Token {
         $this->authdata = AuthData::firstOrCreate(
             ['building_id' => $bid]
         );
-
-        Log::info("Authdata: " . json_encode($this->authdata, JSON_PRETTY_PRINT));
     }
 
+    /**
+     * generates auth URL for this app + permissions scope to redirect the user to log in
+     * @return string $url
+     */
     public function getRedirectUrl() {
 
         $oauthClient = $this->createOauthClient();
@@ -28,6 +29,10 @@ class Token {
         return $oauthClient->getAuthorizationUrl();
     }
 
+    /**
+     * retrieves tokens from GraphAPI based on authorization code and saves them in db
+     * @param string $authCode
+     */
     public function generateTokens($authCode) {
 
         $oauthClient = $this->createOauthClient();
@@ -43,6 +48,11 @@ class Token {
         $this->saveTokens($accessToken, $current_user);
     }
 
+    /**
+     * sends a GET request to Graph API 
+     * @param string $url
+     * @return \Illuminate\Http\Response
+     */
     public function sendRequest($url) {
 
         $graph = new Graph();
@@ -55,14 +65,18 @@ class Token {
         return $response->getBody();
     }
 
+    /**
+     * initializes oauth client for Graph API
+     * @return \League\OAuth2\Client\Provider\GenericProvider
+     */
     private function createOauthClient() {
 
         return new \League\OAuth2\Client\Provider\GenericProvider([
             'clientId' => env('OAUTH_APP_ID'),
             'clientSecret' => env('OAUTH_APP_PASSWORD'),
             'redirectUri' => env('OAUTH_REDIRECT_URI') . $this->authdata->building_id,
-            'urlAuthorize' => env('OAUTH_AUTHORITY') . env('OAUTH_AUTHORIZE_ENDPOINT'),
-            'urlAccessToken' => env('OAUTH_AUTHORITY') . env('OAUTH_TOKEN_ENDPOINT'),
+            'urlAuthorize' => 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+            'urlAccessToken' => 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
             'urlResourceOwnerDetails' => '',
             'scopes' => env('OAUTH_SCOPES'),
         ]);
@@ -72,11 +86,8 @@ class Token {
      * saves token info for a successfully authenticated user
      * @param object $accessToken
      * @param object $user
-     * @param int $bid
      */
     private function saveTokens($accessToken, $user) {
-
-    Log::info("User: " . json_encode($user, JSON_PRETTY_PRINT));
 
         $this->authdata = AuthData::updateOrCreate(
             ['building_id' => $this->authdata->building_id],
@@ -108,7 +119,6 @@ class Token {
 
             Log::debug("Token has expired, retrieving a new one...");
 
-            # expired, let's refresh
             $oauthClient = $this->createOauthClient();
 
             $newToken = $oauthClient->getAccessToken('refresh_token', [
@@ -117,19 +127,12 @@ class Token {
 
             Log::debug("Successfully aquired a new token, storing in db...");
 
-            //$this->authdata->accessToken = $accessToken->getToken();
-            //$this->authdata->refreshToken = $accessToken->getRefreshToken();
-            //$this->authdata->tokenExpires = $accessToken->getExpires();
-            //$this->authdata->save();
-
             $this->authdata = AuthData::updateOrCreate(
                 ['building_id' => $this->authdata->building_id],
                 ['accessToken' => $newToken->getToken(),
                 'refreshToken' => $newToken->getRefreshToken(),
                 'tokenExpires' => $newToken->getExpires()]
             );
-
-            //return $newToken->getToken();
 
         }
 
