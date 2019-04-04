@@ -2,6 +2,7 @@
 
 namespace AtlasVG\Helpers;
 
+use Storage;
 use AtlasVG\Models\Building;
 use AtlasVG\Helpers\GraphAPI;
 use Illuminate\Support\Facades\Log;
@@ -12,16 +13,10 @@ class RemoteData
      * Sync info for all existing pointers
      * @return array $result counts of successful and failed syncs
      */
-    public static function sync($bid = null)
+    public static function sync_data($bid = null)
     {
 
-        if (!$bid) {
-            $bid = Building::select()->first()->id;
-        # if building id is specified but doesn't exist throwing 404
-        } elseif (!Building::find($bid)) {
-            throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-        }
-
+        $bid = RemoteData::validate_bid($bid);
         $building = Building::find($bid);
 
         if (!$building->location) {
@@ -104,4 +99,58 @@ class RemoteData
 
         return $result;
     }
+
+    public static function sync_photos($bid = null) {
+
+        $bid = RemoteData::validate_bid($bid);
+        $building = Building::find($bid);
+
+        $api = new GraphAPI($bid);
+
+        foreach ($building->levels as $level) {
+
+            foreach ($level->pointers as $pointer) {
+
+                $email = $pointer->meta;
+
+                $getPhotoUrl = '/users/' . $email . '/photos/120x120/$value';
+        
+                try {
+
+                    $photo = $api->sendRequest($getPhotoUrl, true);
+                    Storage::disk('public')->put('photos/' . $level->id . '.' . $pointer->space->data . '.jpg', $photo);
+
+                } catch (\GuzzleHttp\Exception\ClientException $exception) {
+
+                    if ($exception->getResponse()->getStatusCode() == "404") {
+                        Log::info("This user doesn't have an avatar");
+                    } elseif ($exception->getResponse()->getStatusCode() == "400") {
+                        Log::warning("User with email address {$pointer->meta} doesn't exist.");
+                    } else {
+                        throw $exception;
+                    }
+                }
+
+            }
+        }   
+    }
+
+
+    /**
+     * Sync info for all existing pointers
+     * @return array $result counts of successful and failed syncs
+     */
+    private static function validate_bid($bid = null) {
+
+        # if no building id is passed, defaulting to the first one
+        if (!$bid) {
+            $bid = Building::select()->first()->id;
+        # if building id is specified but doesn't exist throwing 404
+        } elseif (!Building::find($bid)) {
+            throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+        }
+
+        return $bid;
+    }
+
 }

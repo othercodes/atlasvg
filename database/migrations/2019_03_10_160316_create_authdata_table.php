@@ -13,11 +13,11 @@ class CreateAuthdataTable extends Migration {
     public function up() {
         Schema::create('authdata', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('accessToken');
-            $table->string('refreshToken');
-            $table->unsignedInteger('tokenExpires');
-            $table->string('userName');
-            $table->string('userEmail');
+            $table->string('accessToken')->nullable();
+            $table->string('refreshToken')->nullable();
+            $table->unsignedInteger('tokenExpires')->nullable();
+            $table->string('userName')->nullable();
+            $table->string('userEmail')->nullable();
             $table->timestamps();
         });
     }
