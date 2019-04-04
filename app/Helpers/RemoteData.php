@@ -2,12 +2,9 @@
 
 namespace AtlasVG\Helpers;
 
-use AtlasVG\Models\Pointer;
 use AtlasVG\Models\Building;
-use AtlasVG\Models\Level;
-use AtlasVG\Helpers\Token;
+use AtlasVG\Helpers\GraphAPI;
 use Illuminate\Support\Facades\Log;
-use Microsoft\Graph\Graph;
 
 class RemoteData
 {
@@ -31,12 +28,6 @@ class RemoteData
             throw new \Exception("Location is for building #{$bid} is not defined, cannot perform sync.");
         }
 
-        $token = new Token();
-        $accessToken = $token->getAccessToken($bid);
-
-        $graph = new Graph();
-        $graph->setAccessToken($accessToken);
-
         $queryParams = array(
             '$select' => 'givenName,surname,jobTitle,department,userPrincipalName',
             '$filter' => "officeLocation eq '$building->location'",
@@ -45,11 +36,9 @@ class RemoteData
 
         $getUsersUrl = '/me/people?' . http_build_query($queryParams);
 
-        $response = $graph->createRequest('GET', $getUsersUrl)
-            ->addHeaders(array("Content-Type" => "application/json"))
-            ->execute();
-
-        $users = collect($response->getBody()['value']);
+        $api = new GraphAPI($bid);
+        $response = $api->sendRequest($getUsersUrl);
+        $users = collect($response['value']);
 
         $result = array(
             "successful" => 0,
@@ -74,7 +63,7 @@ class RemoteData
 
                     if ($match) {
 
-                        Log::info("Found a user: {$match['userPrincipalName']}.");
+                        Log::debug("Found a user: {$match['userPrincipalName']}.");
 
                         $pointer->name = "{$match['givenName']} {$match['surname']}";
                         $pointer->description = "Job Title: {$match['jobTitle']} <br> Department: {$match['department']}";
@@ -84,9 +73,29 @@ class RemoteData
 
                     } else {
 
-                        Log::error("Couldn't find user with email: {$pointer->meta}.");
-                        $result['failed']++;
+                        Log::debug("Couldn't find user with email: {$pointer->meta}, retrieving info manually");
 
+                        try {
+
+                            $getUserByEmailUrl = '/users/' . $pointer->meta;
+                            $user = $api->sendRequest($getUserByEmailUrl);
+
+                            # without admin context that API endpoint returns only given name and surname 
+                            $pointer->name = "{$user['givenName']} {$user['surname']}";
+                            $pointer->save();
+
+                            $result['successful']++;
+
+                        } catch (\GuzzleHttp\Exception\ClientException $exception) {
+
+                            if ($exception->getResponse()->getStatusCode() == "404") {
+                                Log::warning("User with email address {$pointer->meta} doesn't exist.");
+                                $result['failed']++;
+                            } else {
+                                throw $exception;
+                            }
+                        }
+                        
                     }
 
                 }
