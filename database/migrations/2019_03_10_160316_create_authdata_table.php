@@ -18,6 +18,11 @@ class CreateAuthdataTable extends Migration {
             $table->unsignedInteger('tokenExpires')->nullable();
             $table->string('userName')->nullable();
             $table->string('userEmail')->nullable();
+            $table->unsignedInteger('building_id')->default(0);
+            $table->foreign('building_id')
+                ->references('id')
+                ->on('buildings')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -118,7 +118,7 @@ class RemoteData
                 try {
 
                     $photo = $api->sendRequest($getPhotoUrl, true);
-                    Storage::disk('public')->put('photos/' . $level->id . '.' . $pointer->space->data . '.jpg', $photo);
+                    Storage::disk('public')->put('img/' . $level->id . '.' . $pointer->space->data . '.jpg', $photo);
 
                 } catch (\GuzzleHttp\Exception\ClientException $exception) {
 

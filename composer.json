@@ -45,7 +45,8 @@
   "scripts": {
     "post-install-cmd": [
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
-      "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\""
+      "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+      "ln -s ../storage/app/public/img public/img"
     ]
   },
   "config": {
