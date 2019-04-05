@@ -28,7 +28,7 @@ class Sync extends \Illuminate\Console\Command
     {
         try {
  
-            $result = \AtlasVG\Helpers\RemoteData::sync_data($this->argument('bid'));
+            $result = \AtlasVG\Helpers\RemoteData::sync($this->argument('bid'));
 
             $total = $result['successful'] + $result['failed'];
 
@@ -37,8 +37,6 @@ class Sync extends \Illuminate\Console\Command
             if ($result['failed']) {
                 $this->error("Failed to synchronize {$result['failed']}/{$total} people. Check the logs for details.");
             }
-
-            \AtlasVG\Helpers\RemoteData::sync_photos($this->argument('bid'));
 
         } catch (\Exception $e) {
             $this->error($e->getMessage());

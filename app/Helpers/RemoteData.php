@@ -13,7 +13,7 @@ class RemoteData
      * Sync info for all existing pointers
      * @return array $result counts of successful and failed syncs
      */
-    public static function sync_data($bid = null)
+    public static function sync($bid = null)
     {
 
         $bid = RemoteData::validate_bid($bid);
@@ -64,6 +64,8 @@ class RemoteData
                         $pointer->description = "Job Title: {$match['jobTitle']} <br> Department: {$match['department']}";
                         $pointer->save();
 
+                        RemoteData::getPhoto($bid, $pointer->meta, $level->id . '.' . $pointer->space->data);
+
                         $result['successful']++;
 
                     } else {
@@ -78,6 +80,8 @@ class RemoteData
                             # without admin context that API endpoint returns only given name and surname 
                             $pointer->name = "{$user['givenName']} {$user['surname']}";
                             $pointer->save();
+
+                            RemoteData::getPhoto($bid, $pointer->meta, $level->id . '.' . $pointer->space->data);
 
                             $result['successful']++;
 
@@ -100,41 +104,29 @@ class RemoteData
         return $result;
     }
 
-    public static function sync_photos($bid = null) {
-
-        $bid = RemoteData::validate_bid($bid);
-        $building = Building::find($bid);
+    public static function getPhoto($bid, $email, $img_name) {
 
         $api = new GraphAPI($bid);
 
-        foreach ($building->levels as $level) {
+        $getPhotoUrl = '/users/' . $email . '/photos/120x120/$value';
 
-            foreach ($level->pointers as $pointer) {
+        try {
 
-                $email = $pointer->meta;
+            $photo = $api->sendRequest($getPhotoUrl, true);
+            Storage::disk('public')->put('img/' . $img_name . '.jpg', $photo);
 
-                $getPhotoUrl = '/users/' . $email . '/photos/120x120/$value';
-        
-                try {
+        } catch (\GuzzleHttp\Exception\ClientException $exception) {
 
-                    $photo = $api->sendRequest($getPhotoUrl, true);
-                    Storage::disk('public')->put('img/' . $level->id . '.' . $pointer->space->data . '.jpg', $photo);
-
-                } catch (\GuzzleHttp\Exception\ClientException $exception) {
-
-                    if ($exception->getResponse()->getStatusCode() == "404") {
-                        Log::info("This user doesn't have an avatar");
-                    } elseif ($exception->getResponse()->getStatusCode() == "400") {
-                        Log::warning("User with email address {$pointer->meta} doesn't exist.");
-                    } else {
-                        throw $exception;
-                    }
-                }
-
+            if ($exception->getResponse()->getStatusCode() == "404") {
+                Log::info("This user doesn't have an avatar");
+            } elseif ($exception->getResponse()->getStatusCode() == "400") {
+                Log::warning("User with email address {$pointer->meta} doesn't exist.");
+            } else {
+                throw $exception;
             }
-        }   
-    }
 
+        }  
+    }
 
     /**
      * Sync info for all existing pointers
