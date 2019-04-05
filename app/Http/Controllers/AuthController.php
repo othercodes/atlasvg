@@ -3,15 +3,16 @@
 namespace AtlasVG\Http\Controllers;
 
 use AtlasVG\Http\Controllers\Controller;
-use AtlasVG\Models\Building;
 use AtlasVG\Helpers\GraphAPI;
+use AtlasVG\Helpers\RemoteData;
+use AtlasVG\Models\Building;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller {
 
     public function signin($bid = null) {
 
-        $bid = $this->validate_bid($bid);
+        $bid = RemoteData::validate_bid($bid);
         $api = new GraphAPI($bid);
 
         $authUrl = $api->getRedirectUrl();
@@ -24,7 +25,7 @@ class AuthController extends Controller {
 
     public function callback(Request $request, $bid = null) {
 
-        $bid = $this->validate_bid($bid);
+        $bid = RemoteData::validate_bid($bid);
         // authorization code should be in the "code" query param
         $authCode = $request->query('code');
 
@@ -33,18 +34,5 @@ class AuthController extends Controller {
 
         return redirect('/app/sync/' .$bid);
 
-    }
-
-    private function validate_bid($bid = null) {
-
-        # if no building id is passed, defaulting to the first one
-        if (!$bid) {
-            $bid = Building::select()->first()->id;
-        # if building id is specified but doesn't exist throwing 404
-        } elseif (!Building::find($bid)) {
-            throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-        }
-
-        return $bid;
     }
 }

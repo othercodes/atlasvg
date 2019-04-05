@@ -17,6 +17,7 @@ class CreateBuildingsTable extends Migration
                 ->unsigned();
 
             $table->string('name');
+            $table->string('location')->nullable();
             $table->text('description');
             $table->text('svg');
             $table->float('proportion')

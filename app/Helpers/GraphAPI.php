@@ -53,7 +53,7 @@ class GraphAPI {
      * @param string $url
      * @return \Illuminate\Http\Response
      */
-    public function sendRequest($url) {
+    public function sendRequest($url, $isRawResponse = false) {
 
         $graph = new Graph();
         $graph->setAccessToken($this->getAccessToken());
@@ -62,7 +62,7 @@ class GraphAPI {
             ->addHeaders(array("Content-Type" => "application/json"))
             ->execute();
 
-        return $response->getBody();
+        return $isRawResponse ? $response->getRawBody() : $response->getBody();
     }
 
     /**
@@ -115,7 +115,7 @@ class GraphAPI {
         // just in case setting current time += 5 minutes (to allow for time differences)
         $now = time() + 300;
 
-        if ($this->authdata->tokenExpires <= $now) {
+        if ($this->authdata->tokenExpires && $this->authdata->tokenExpires <= $now) {
 
             Log::debug("Token has expired, retrieving a new one...");
 

@@ -27,8 +27,9 @@ class Sync extends \Illuminate\Console\Command
     public function handle()
     {
         try {
-
+ 
             $result = \AtlasVG\Helpers\RemoteData::sync($this->argument('bid'));
+
             $total = $result['successful'] + $result['failed'];
 
             $this->info("Successfully synchronized {$result['successful']}/{$total} people.");
