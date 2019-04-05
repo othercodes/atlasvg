@@ -133,7 +133,7 @@ class RemoteData
      * Sync info for all existing pointers
      * @return array $result counts of successful and failed syncs
      */
-    private static function validate_bid($bid = null) {
+    public static function validate_bid($bid = null) {
 
         # if no building id is passed, defaulting to the first one
         if (!$bid) {

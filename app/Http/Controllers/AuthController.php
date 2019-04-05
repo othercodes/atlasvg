@@ -4,6 +4,7 @@ namespace AtlasVG\Http\Controllers;
 
 use AtlasVG\Http\Controllers\Controller;
 use AtlasVG\Helpers\GraphAPI;
+use AtlasVG\Helpers\RemoteData;
 use AtlasVG\Models\Building;
 use Illuminate\Http\Request;
 
