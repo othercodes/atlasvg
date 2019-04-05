@@ -3,8 +3,9 @@
 namespace AtlasVG\Helpers;
 
 use Storage;
-use AtlasVG\Models\Building;
 use AtlasVG\Helpers\GraphAPI;
+use AtlasVG\Models\Building;
+
 use Illuminate\Support\Facades\Log;
 
 class RemoteData

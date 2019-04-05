@@ -5,7 +5,6 @@ namespace AtlasVG\Http\Controllers;
 use AtlasVG\Http\Controllers\Controller;
 use AtlasVG\Helpers\GraphAPI;
 use AtlasVG\Models\Building;
-use AtlasVG\Helpers\GraphAPI;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller {
