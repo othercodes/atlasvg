@@ -374,8 +374,10 @@
                                     </p>
                                     <!-- !! disables XSS prevention thought htmlspecialchars() (https://laravel.com/docs/5.8/blade#displaying-data), might need a better solution to have line breaks -->
                                     <p class="content__desc">
-                                        <img src="{{url('/img/' . $level->id . '.' . $pointer->space->data . '.jpg')}}" 
-                                        style="float:right;width:120px;height:120px" alt=""/>
+                                        @if (file_exists(url('/img/' . $level->id . '.' . $pointer->space->data . '.jpg')))
+                                            <img src="{{url('/img/' . $level->id . '.' . $pointer->space->data . '.jpg')}}" 
+                                            style="float:right;width:120px;height:120px" alt=""/>
+                                        @endif
                                         {!! $pointer->description !!}
                                     </p>
                                 </div>

@@ -22,7 +22,6 @@ class CreatePointersTable extends Migration
                 ->default('Meta')
                 ->nullable();
             $table->text('description')
-                ->default('Description')
                 ->nullable();
 
             $table->float('top')
